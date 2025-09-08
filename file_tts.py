@@ -34,7 +34,9 @@ def run_file_tts(model, processor, device, sampling_rate):
     """Chạy quy trình Text-to-Speech từ file."""
     try:
         clear_screen()
-        print("======= TEXT-TO-SPEECH =======")
+        print("============================================")
+        print("============== TEXT-TO-SPEECH ==============")
+        print("============================================")
 
         # NÂNG CẤP: Tự động quét thư mục 'Input'
         # print("Đang quét thư mục 'Input' để tìm file .txt...")
@@ -57,17 +59,29 @@ def run_file_tts(model, processor, device, sampling_rate):
         print("\nChọn một giọng nói để sử dụng:")
         for display_name in VOICE_PRESETS.keys():
             print(f"  {display_name}")
+        print("  0. Quay lại menu chính")
         
         while True:
-            choice = input("Nhập lựa chọn của bạn: ")
+            choice = input("Nhập lựa chọn của bạn (0 để quay lại): ")
+
+            if choice == '0':
+                print("Đang quay lại menu chính...")
+                return
+            
             try:
                 choice_num = int(choice)
-                selected_display_name = list(VOICE_PRESETS.keys())[choice_num - 1]
-                voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
-                lang_code = VOICE_PRESETS[selected_display_name]["lang"]
-                break
-            except (ValueError, IndexError):
-                print("Lựa chọn không hợp lệ!")
+                # Kiểm tra để đảm bảo lựa chọn nằm trong phạm vi hợp lệ
+                if 1 <= choice_num <= len(VOICE_PRESETS):
+                    selected_display_name = list(VOICE_PRESETS.keys())[choice_num - 1]
+                    voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
+                    lang_code = VOICE_PRESETS[selected_display_name]["lang"]
+                    break # Lựa chọn hợp lệ, thoát khỏi vòng lặp
+                else:
+                    # Nếu người dùng nhập số ngoài phạm vi
+                    print("Lựa chọn không hợp lệ! Vui lòng chọn một số trong danh sách.")
+            except ValueError:
+                # Nếu người dùng nhập chữ thay vì số
+                print("Lựa chọn không hợp lệ! Vui lòng chỉ nhập số.")
 
         # 3. Xử lý và tạo âm thanh
         print("\nBắt đầu quá trình tạo âm thanh...")

@@ -7,6 +7,7 @@ import sounddevice as sd
 from config import VOICE_PRESETS, TEXT_SAMPLES, CACHE_DIR
 from tts_utils import generate_audio_chunk
 from tqdm import tqdm
+import time
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -17,7 +18,7 @@ def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_r
     filepath = os.path.join(CACHE_DIR, filename)
 
     if os.path.exists(filepath):
-        print(f"\nĐang đọc giọng: {filepath}")
+        # print(f"\nĐang đọc giọng: {filepath}")
         rate, audio_data = read(filepath)
         return audio_data
     
@@ -44,27 +45,40 @@ def run_jukebox(model, processor, device, sampling_rate):
             
             for display_name in VOICE_PRESETS.keys():
                 print(f"  {display_name}")
-            print("\nNhập 'q' hoặc nhấn (Ctrl + C) để quay lại menu chính.")
             
-            choice = input("Nhập lựa chọn của bạn: ")
+            # NÂNG CẤP: Thêm tùy chọn thoát rõ ràng
+            print("  0. Quay lại menu chính")
+            # print("\nNhấn (Ctrl + C) cũng sẽ quay lại menu chính.")
+            
+            # NÂNG CẤP: Cập nhật gợi ý input
+            choice = input("\nNhập lựa chọn của bạn (0 để quay lại): ")
 
-            if choice.lower() == 'q':
-                break
-            
+            # NÂNG CẤP: Ưu tiên xử lý lựa chọn thoát
+            if choice == '0':
+                print("Đang quay lại menu chính...")
+                break # Thoát khỏi vòng lặp while và kết thúc hàm run_jukebox
+
             try:
                 choice_num = int(choice)
-                selected_display_name = list(VOICE_PRESETS.keys())[choice_num - 1]
-                selected_voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
-                
-                audio_to_play = get_audio_from_cache(selected_voice_preset, model, processor, device, sampling_rate)
-                
-                print(f"\nĐang phát giọng: {selected_display_name}...")
-                sd.play(audio_to_play, sampling_rate)
-                sd.wait()
-            except (ValueError, IndexError):
-                print("\nLựa chọn không hợp lệ!")
-            
-            input("\nNhấn Enter để tiếp tục...")
+                # NÂNG CẤP: Kiểm tra lựa chọn nằm trong phạm vi hợp lệ
+                if 1 <= choice_num <= len(VOICE_PRESETS):
+                    selected_display_name = list(VOICE_PRESETS.keys())[choice_num - 1]
+                    selected_voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
+                    
+                    audio_to_play = get_audio_from_cache(selected_voice_preset, model, processor, device, sampling_rate)
+                    
+                    print(f"\nĐang phát giọng: {selected_display_name}...")
+                    sd.play(audio_to_play, sampling_rate)
+                    sd.wait()
+                    time.sleep(1)
+                else:
+                    print("\nLựa chọn không hợp lệ! Vui lòng chọn một số trong danh sách.")
+                    time.sleep(1.5)
+
+            except ValueError:
+                # Nếu người dùng nhập chữ
+                print("\nLựa chọn không hợp lệ! Vui lòng chỉ nhập số.")
+                time.sleep(1.5)
 
     except KeyboardInterrupt:
         print("\nĐang quay lại menu chính...")

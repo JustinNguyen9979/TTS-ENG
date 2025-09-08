@@ -12,7 +12,7 @@ def load_models():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     if torch.backends.mps.is_available():
         device = "mps"
-    print(f"Sử dụng thiết bị: {device}")
+    # print(f"Sử dụng thiết bị: {device}")
 
     print("Đang tải mô hình suno/bark...")
     processor = AutoProcessor.from_pretrained("suno/bark")
