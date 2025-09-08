@@ -1,7 +1,6 @@
 *.wav
 __cache__/
 venv/
-audio_cache/
 __pycache__/
 Input/
 Output/

@@ -12,7 +12,7 @@ def clear_screen():
 
 def setup_directories():
     """Tự động tạo các thư mục cần thiết nếu chúng chưa tồn tại."""
-    print("Đang kiểm tra và thiết lập các thư mục cần thiết...")
+    print("Đang kiểm tra và tạo các thư mục cần thiết...")
     # NÂNG CẤP: Thêm 'Input' và 'Output' vào danh sách
     required_dirs = [CACHE_DIR, "Input", "Output"]
     for dir_name in required_dirs:
@@ -33,7 +33,7 @@ def main_menu():
             clear_screen()
             print("======= CÔNG CỤ TẠO GIỌNG NÓI SUNO/BARK (v2) =======")
             print("1. Nghe thử các giọng nói (Jukebox)")
-            print("2. Tạo âm thanh từ file trong thư mục 'Input'")
+            print("2. Tạo âm thanh")
             print("3. Thoát chương trình")
             print("===================================================")
             
