@@ -1,3 +1,4 @@
 *.wav
 __cache__/
 venv/
+audio_cache/
