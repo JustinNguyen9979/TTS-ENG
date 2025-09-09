@@ -11,12 +11,12 @@ TEXT_SAMPLES = {
 
 # Danh sách các giọng nói có sẵn
 VOICE_PRESETS = {
-    "1. English - Male, Deep (Phổ biến)": {"preset": "v2/en_speaker_6", "lang": "en"},
-    "2. English - Female, Deep": {"preset": "v2/en_speaker_9", "lang": "en"},
-    "3. English - Male, Higher": {"preset": "v2/en_speaker_2", "lang": "en"}, 
-    "4. French - Female (English)": {"preset": "v2/fr_speaker_5", "lang": "fr"},
-    "5. Japanese - Female (Japanese)": {"preset": "v2/ja_speaker_3", "lang": "ja"},
-    "6. Chinese - Male (Chinese)": {"preset": "v2/zh_speaker_5", "lang": "zh"},
+    "1. English - Male, Drake (Phổ biến)": {"preset": "v2/en_speaker_6", "lang": "en"},
+    "2. English - Female, Venus": {"preset": "v2/en_speaker_9", "lang": "en"},
+    "3. English - Male, Brian": {"preset": "v2/en_speaker_2", "lang": "en"}, 
+    "4. French - Female, Charlotte": {"preset": "v2/fr_speaker_5", "lang": "fr"},
+    "5. Japanese - Female, Rin": {"preset": "v2/ja_speaker_3", "lang": "ja"},
+    "6. Chinese - Male, Lee": {"preset": "v2/zh_speaker_5", "lang": "zh"},
 }
 
 # Tên thư mục cache
