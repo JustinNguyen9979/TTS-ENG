@@ -3,7 +3,7 @@
 import os
 import pyfiglet
 
-VERSION = "v5.0 - Dynamic UI Edition"
+VERSION = "v5.0 - Justin Nguyen"
 
 def clear_screen():
     """Xóa màn hình terminal."""

@@ -41,7 +41,7 @@ def run_jukebox(model, processor, device, sampling_rate):
     try:
         while True:
             clear_screen()
-            print(generate_centered_ascii_title("BOX VOICE"))
+            print(generate_centered_ascii_title("Box Voice"))
             print("Chọn một giọng nói để nghe thử:")
             
             for display_name in VOICE_PRESETS.keys():

@@ -38,7 +38,7 @@ def run_file_tts(model, processor, device, sampling_rate):
     """Chạy quy trình Text-to-Speech từ file."""
     try:
         clear_screen()
-        print(generate_centered_ascii_title("TEXT TO SPEECH"))
+        print(generate_centered_ascii_title("Text To Speech"))
         
         initial_files = find_and_sort_input_files()
 

@@ -2,54 +2,125 @@
 
 import torch
 import os
-from ui import clear_screen, generate_centered_ascii_title
+import psutil
+from cpuinfo import get_cpu_info
+from config import MIN_RAM_GB, MIN_VRAM_GB
+from ui import generate_centered_ascii_title, clear_screen
 
-def clear_screen():
-    """Xóa màn hình terminal."""
-    os.system('cls' if os.name == 'nt' else 'clear')
+try:
+    import pynvml
+    NVML_AVAILABLE = True
+except ImportError:
+    NVML_AVAILABLE = False
+
+def get_system_specs():
+    # ... (Hàm này giữ nguyên, không cần thay đổi) ...
+    specs = {}
+    cpu_info = get_cpu_info()
+    specs['cpu_model'] = cpu_info.get('brand_raw', 'Không xác định')
+    specs['cpu_cores'] = psutil.cpu_count(logical=True)
+    mem = psutil.virtual_memory()
+    specs['ram_total_gb'] = round(mem.total / (1024**3), 2)
+    specs['ram_available_gb'] = round(mem.available / (1024**3), 2)
+    specs['gpu_model'] = "Không có"
+    specs['gpu_vram_total_gb'] = 0
+    specs['compute_platform'] = "CPU"
+    specs['active_device'] = "cpu"
+    if torch.cuda.is_available():
+        specs['active_device'] = "cuda"
+        specs['compute_platform'] = f"NVIDIA CUDA v{torch.version.cuda}"
+        if NVML_AVAILABLE:
+            try:
+                pynvml.nvmlInit()
+                handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+                specs['gpu_model'] = pynvml.nvmlDeviceGetName(handle)
+                mem_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+                specs['gpu_vram_total_gb'] = round(mem_info.total / (1024**3), 2)
+                pynvml.nvmlShutdown()
+            except Exception:
+                specs['gpu_model'] = torch.cuda.get_device_name(0)
+                specs['gpu_vram_total_gb'] = round(torch.cuda.get_device_properties(0).total_memory / (1024**3), 2)
+        else:
+            specs['gpu_model'] = torch.cuda.get_device_name(0)
+            specs['gpu_vram_total_gb'] = round(torch.cuda.get_device_properties(0).total_memory / (1024**3), 2)
+    elif torch.backends.mps.is_available():
+        specs['active_device'] = "mps"
+        specs['compute_platform'] = "Apple Metal (MPS)"
+        specs['gpu_model'] = "Apple Silicon (Unified Memory)"
+        specs['gpu_vram_total_gb'] = specs['ram_total_gb']
+    return specs
+
+def evaluate_specs(specs):
+    # ... (Hàm này giữ nguyên, không cần thay đổi) ...
+    failure_reasons = []
+    if specs['ram_total_gb'] < MIN_RAM_GB:
+        failure_reasons.append(f"- RAM hệ thống ({specs['ram_total_gb']}GB) thấp hơn yêu cầu ({MIN_RAM_GB}GB).")
+    if specs['compute_platform'].startswith("NVIDIA CUDA"):
+        if specs['gpu_vram_total_gb'] < MIN_VRAM_GB:
+            failure_reasons.append(f"- VRAM của GPU ({specs['gpu_vram_total_gb']}GB) thấp hơn yêu cầu ({MIN_VRAM_GB}GB).")
+    return not failure_reasons, failure_reasons
 
 def run_hardware_check():
-    """
-    Kiểm tra và hiển thị thông tin về CPU/GPU mà PyTorch đang sử dụng.
-    Đây là hàm duy nhất được export từ module này.
-    """
+    """Hàm chính để chạy toàn bộ quy trình kiểm tra và hiển thị."""
     clear_screen()
-    print(generate_centered_ascii_title("HARDWARE CHECK"))
-    print(f"Phiên bản PyTorch: {torch.__version__}")
+    print(generate_centered_ascii_title("Hardware Check", font='small'))
     
-    # Kiểm tra cho GPU NVIDIA (CUDA)
-    is_cuda_available = torch.cuda.is_available()
-    print(f"\n[NVIDIA GPU]")
-    print(f"Hỗ trợ CUDA: {is_cuda_available}")
-    if is_cuda_available:
-        gpu_count = torch.cuda.device_count()
-        print(f"Số lượng GPU tìm thấy: {gpu_count}")
-        for i in range(gpu_count):
-            print(f"  - GPU {i}: {torch.cuda.get_device_name(i)}")
-    else:
-        print(" -> Không tìm thấy GPU NVIDIA hoặc PyTorch chưa được cài đặt với hỗ trợ CUDA.")
+    # print("\nĐang thu thập thông tin hệ thống...")
+    specs = get_system_specs()
+    is_sufficient, reasons = evaluate_specs(specs)
+    
+    # NÂNG CẤP: Logic hiển thị hộp thông tin với căn lề trái
+    # 1. Tạo một danh sách các cặp (label, value)
+    info_data = [
+        ('CPU', f"{specs['cpu_model']} ({specs['cpu_cores']} cores)"),
+        ('RAM', f"{specs['ram_total_gb']} GB (Khả dụng: {specs['ram_available_gb']} GB)"),
+        ('GPU', f"{specs['gpu_model']}")
+    ]
+    if specs['compute_platform'] != "CPU":
+        info_data.append(('VRAM', f"{specs['gpu_vram_total_gb']} GB"))
+        info_data.append(('Nền tảng', f"{specs['compute_platform']}"))
 
-    # Kiểm tra cho GPU Apple (MPS)
-    is_mps_available = torch.backends.mps.is_available()
-    print(f"\n[APPLE GPU]")
-    print(f"Hỗ trợ MPS (Apple Silicon): {is_mps_available}")
-    if not is_mps_available:
-        print(" -> Đây không phải là máy Mac với chip Apple Silicon hoặc PyTorch chưa hỗ trợ.")
+    # 2. Tìm chiều dài của label dài nhất để căn chỉnh
+    label_width = max(len(label) for label, value in info_data)
 
-    # Xác định thiết bị sẽ được sử dụng bởi các module khác
-    device = "cpu"
-    if is_cuda_available:
-        device = "cuda"
-    elif is_mps_available:
-        device = "mps"
+    # 3. Tạo các dòng đã được định dạng với các dấu hai chấm thẳng hàng
+    formatted_lines = [f"{label.ljust(label_width)} : {value}" for label, value in info_data]
     
-    result_text = f">>> THIẾT BỊ SẼ ĐƯỢC ƯU TIÊN SỬ DỤNG: {device.upper()} <<<"
+    # 4. Tìm chiều dài của dòng dài nhất trong các dòng đã định dạng
+    max_line_length = max(len(line) for line in formatted_lines)
+    title = "--- THÔNG TIN HỆ THỐNG ---"
+    # Đảm bảo đường viền đủ dài cho cả tiêu đề và nội dung
+    box_width = max(max_line_length, len(title))
     
-    line_length = len(result_text)
-    dash_line = "-" * line_length
+    # 5. Tạo đường viền và in ra hộp thông tin
+    dash_line = "-" * (box_width + 4) # Thêm padding 2 bên
 
     print(f"\n{dash_line}")
-    print(result_text)
+    print(title.center(len(dash_line)))
+    for line in formatted_lines:
+        # In mỗi dòng với 2 khoảng trắng đệm ở bên trái
+        print(f"  {line}")
     print(dash_line)
+    
+    # Các phần còn lại giữ nguyên
+    print(f"\n➡️ Chương trình ưu tiên sử dụng: {specs['active_device'].upper()}")
+
+    if is_sufficient:
+        result_text = ">>> MÁY TÍNH ĐỦ ĐIỀU KIỆN ĐỂ CHẠY <<<"
+    else:
+        result_text = ">>> MÁY TÍNH KHÔNG ĐỦ ĐIỀU KIỆN <<<"
+        
+    result_line_length = len(result_text)
+    result_dash_line = "-" * result_line_length
+    
+    print(f"\n{result_dash_line}")
+    print(result_text)
+    print(result_dash_line)
+    
+    if not is_sufficient:
+        print("\nLý do:")
+        for reason in reasons:
+            print(reason)
+        print("\n*Lưu ý: Chương trình vẫn có thể chạy nhưng sẽ rất chậm hoặc gặp lỗi bộ nhớ.")
 
     input("\nNhấn Enter để quay lại menu chính...")

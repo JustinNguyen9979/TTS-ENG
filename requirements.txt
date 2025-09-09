@@ -6,3 +6,6 @@ numpy
 tqdm 
 pydub
 pyfiglet
+psutil
+pynvml
+py-cpuinfo

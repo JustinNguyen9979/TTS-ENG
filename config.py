@@ -1,5 +1,8 @@
 # config.py
 
+MIN_RAM_GB = 8
+MIN_VRAM_GB = 6
+
 # Đoạn văn bản mẫu để nghe thử trong Jukebox
 TEXT_SAMPLES = {
     "en": "A very warm welcome to you! It is a genuine pleasure to have you with us today. I sincerely hope you've been having a wonderful day so far and that the rest of your time here is enjoyable and productive.",
