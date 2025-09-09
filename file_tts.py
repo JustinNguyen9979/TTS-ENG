@@ -90,7 +90,18 @@ def run_file_tts(model, processor, device, sampling_rate):
             
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
-                    full_text = f.read()
+                    full_text = f.read().strip()
+
+                if not full_text:
+                    print(f"⚠️ Cảnh báo: File '{os.path.basename(file_path)}' không có nội dung. Bỏ qua file này.")
+                    processed_files_set.add(file_path) # Đánh dấu đã xử lý để không lặp lại
+                    # Kiểm tra file mới trước khi tiếp tục
+                    current_all_files = find_and_sort_input_files()
+                    for new_file in current_all_files:
+                        if new_file not in files_to_process and new_file not in processed_files_set:
+                            files_to_process.append(new_file)
+                    continue # Chuyển sang file tiếp theo trong hàng đợi
+
             except Exception as e:
                 print(f"Lỗi khi đọc file {file_path}: {e}. Bỏ qua file này.")
                 processed_files_set.add(file_path) # Đánh dấu đã xử lý (dù lỗi)
@@ -105,6 +116,12 @@ def run_file_tts(model, processor, device, sampling_rate):
                 pieces.append(audio_chunk)
                 pause_samples = np.zeros(int(sampling_rate * 0.5), dtype=np.float32)
                 pieces.append(pause_samples)
+
+            if not pieces:
+                # Trường hợp này hiếm khi xảy ra nếu đã kiểm tra file rỗng, nhưng để dự phòng
+                print(f"⚠️ Cảnh báo: File '{os.path.basename(file_path)}' rỗng. Bỏ qua.")
+                processed_files_set.add(file_path)
+                continue
 
             final_audio_data = np.concatenate(pieces)
             
@@ -132,7 +149,7 @@ def run_file_tts(model, processor, device, sampling_rate):
                     files_to_process.append(new_file) # Thêm vào cuối hàng đợi
 
         # KHI VÒNG LẶP KẾT THÚC (HÀNG ĐỢI RỖNG)
-        print("-" * 60)
+        print("\n-" * 60)
         print("✅ XUẤT FILE AUDIO THÀNH CÔNG!")
         if processed_files_log:
             print("Các file sau đã được tạo thành công:")
