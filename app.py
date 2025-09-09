@@ -6,6 +6,8 @@ from config import CACHE_DIR
 from tts_utils import load_models
 from jukebox import run_jukebox
 from file_tts import run_file_tts
+from hardware_check import run_hardware_check
+from ui import display_main_menu
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -30,20 +32,17 @@ def main_menu():
 
     try:
         while True:
-            clear_screen()
-            print("======= CÔNG CỤ TẠO GIỌNG NÓI SUNO/BARK (v2) =======")
-            print("1. Nghe thử các giọng nói (Jukebox)")
-            print("2. Tạo âm thanh")
-            print("3. Thoát chương trình")
-            print("===================================================")
+            display_main_menu()
             
-            choice = input("Nhập lựa chọn của bạn (1-3): ")
+            choice = input("Nhập lựa chọn của bạn (1-4): ")
 
             if choice == '1':
                 run_jukebox(model, processor, device, sampling_rate)
             elif choice == '2':
                 run_file_tts(model, processor, device, sampling_rate)
             elif choice == '3':
+                run_hardware_check()
+            elif choice == '4':
                 print("Tạm biệt!")
                 sys.exit(0)
             else:

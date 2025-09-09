@@ -5,3 +5,4 @@ sounddevice
 numpy 
 tqdm 
 pydub
+pyfiglet

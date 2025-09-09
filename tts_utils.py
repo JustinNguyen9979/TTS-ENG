@@ -14,7 +14,7 @@ def load_models():
         device = "mps"
     # print(f"Sử dụng thiết bị: {device}")
 
-    print("Đang tải mô hình suno/bark...")
+    print("Đang tải mô hình TTS...")
     processor = AutoProcessor.from_pretrained("suno/bark")
     model = BarkModel.from_pretrained("suno/bark").to(device)
     sampling_rate = model.generation_config.sample_rate

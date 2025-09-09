@@ -9,6 +9,7 @@ from config import VOICE_PRESETS
 from tts_utils import generate_audio_chunk
 from tqdm import tqdm
 import time
+from ui import clear_screen, generate_centered_ascii_title
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -37,9 +38,7 @@ def run_file_tts(model, processor, device, sampling_rate):
     """Chạy quy trình Text-to-Speech từ file."""
     try:
         clear_screen()
-        print("============================================")
-        print("============== TEXT-TO-SPEECH ==============")
-        print("============================================")
+        print(generate_centered_ascii_title("TEXT TO SPEECH"))
         
         initial_files = find_and_sort_input_files()
 

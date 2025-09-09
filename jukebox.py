@@ -8,6 +8,7 @@ from config import VOICE_PRESETS, TEXT_SAMPLES, CACHE_DIR
 from tts_utils import generate_audio_chunk
 from tqdm import tqdm
 import time
+from ui import clear_screen, generate_centered_ascii_title
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -40,7 +41,7 @@ def run_jukebox(model, processor, device, sampling_rate):
     try:
         while True:
             clear_screen()
-            print("======= JUKEBOX GIỌNG NÓI =======")
+            print(generate_centered_ascii_title("BOX VOICE"))
             print("Chọn một giọng nói để nghe thử:")
             
             for display_name in VOICE_PRESETS.keys():
