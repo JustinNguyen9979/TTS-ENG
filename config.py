@@ -57,7 +57,7 @@ VOICE_PRESETS = {
     "27. German - Male, Paul": {"preset": "v2/de_speaker_7", "lang": "de"},
     "28. German - Female, Emma": {"preset": "v2/de_speaker_8", "lang": "de"},
     "29. German - Male, Noah": {"preset": "v2/de_speaker_9", "lang": "de"},
-    "30. German - Female, Julian": {"preset": "v2/de_speaker_0", "lang": "de"},
+    "30. German - Male, Emil": {"preset": "v2/de_speaker_0", "lang": "de"},
 
     # --- Spanish (31-40) (Tây Ban Nha) ---
     "31. Spanish - Male, Santiago": {"preset": "v2/es_speaker_1", "lang": "es"},
@@ -88,11 +88,11 @@ VOICE_PRESETS = {
     "52. Japanese - Male, Kaito": {"preset": "v2/ja_speaker_2", "lang": "ja"},
     "53. Japanese - Female, Himari": {"preset": "v2/ja_speaker_3", "lang": "ja"},
     "54. Japanese - Female, Sakura": {"preset": "v2/ja_speaker_4", "lang": "ja"},
-    "55. Japanese - Male, Sora": {"preset": "v2/ja_speaker_5", "lang": "ja"},
-    "56. Japanese - Female, Yui": {"preset": "v2/ja_speaker_6", "lang": "ja"},
-    "57. Japanese - Male, Riku": {"preset": "v2/ja_speaker_7", "lang": "ja"},
+    "55. Japanese - Female, Hinata": {"preset": "v2/ja_speaker_5", "lang": "ja"},
+    "56. Japanese - Male, Hayato": {"preset": "v2/ja_speaker_6", "lang": "ja"},
+    "57. Japanese - Female, Misaki": {"preset": "v2/ja_speaker_7", "lang": "ja"},
     "58. Japanese - Female, Rin": {"preset": "v2/ja_speaker_8", "lang": "ja"},
-    "59. Japanese - Male, Yuki": {"preset": "v2/ja_speaker_9", "lang": "ja"},
+    "59. Japanese - Female, Koharu": {"preset": "v2/ja_speaker_9", "lang": "ja"},
     "60. Japanese - Female, Aoi": {"preset": "v2/ja_speaker_0", "lang": "ja"},
 
     # --- Korean (61-70) (Hàn Quốc) ---
