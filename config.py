@@ -109,15 +109,15 @@ VOICE_PRESETS = {
 
     # --- Chinese (71-80) (Trung Quốc) ---
     "71. Chinese - Male, Wei": {"preset": "v2/zh_speaker_1", "lang": "zh"},
-    "72. Chinese - Female, Lin": {"preset": "v2/zh_speaker_2", "lang": "zh"},
+    "72. Chinese - Male, Zixuan": {"preset": "v2/zh_speaker_2", "lang": "zh"},
     "73. Chinese - Male, Jun": {"preset": "v2/zh_speaker_3", "lang": "zh"},
     "74. Chinese - Female, Mei": {"preset": "v2/zh_speaker_4", "lang": "zh"},
     "75. Chinese - Male, Ming": {"preset": "v2/zh_speaker_5", "lang": "zh"},
     "76. Chinese - Female, Jia": {"preset": "v2/zh_speaker_6", "lang": "zh"},
-    "77. Chinese - Male, Hao": {"preset": "v2/zh_speaker_7", "lang": "zh"},
-    "78. Chinese - Female, Fang": {"preset": "v2/zh_speaker_8", "lang": "zh"},
-    "79. Chinese - Male, Lee": {"preset": "v2/zh_speaker_9", "lang": "zh"},
-    "80. Chinese - Female, Jing": {"preset": "v2/zh_speaker_0", "lang": "zh"},
+    "77. Chinese - Female, Yuhan": {"preset": "v2/zh_speaker_7", "lang": "zh"},
+    "78. Chinese - Male, Yuze": {"preset": "v2/zh_speaker_8", "lang": "zh"},
+    "79. Chinese - Female, Ruoxi": {"preset": "v2/zh_speaker_9", "lang": "zh"},
+    "80. Chinese - Male, Lee": {"preset": "v2/zh_speaker_0", "lang": "zh"},
 
     # --- Portuguese (81-90) (Bồ Đào Nha) ---
     "81. Portuguese - Male, João": {"preset": "v2/pt_speaker_1", "lang": "pt"},
