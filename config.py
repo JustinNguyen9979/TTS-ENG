@@ -139,15 +139,15 @@ VOICE_PRESETS = {
 
     # --- Turkish (Thổ Nhỹ Kỳ) ---
     "1. Turkish - Male, Yusuf": {"preset": "v2/tr_speaker_1", "lang": "tr"},
-    "2. Turkish - Female, Zeynep": {"preset": "v2/tr_speaker_2", "lang": "tr"},
+    "2. Turkish - Male, Ali": {"preset": "v2/tr_speaker_2", "lang": "tr"},
     "3. Turkish - Male, Mehmet": {"preset": "v2/tr_speaker_3", "lang": "tr"},
     "4. Turkish - Female, Elif": {"preset": "v2/tr_speaker_4", "lang": "tr"},
-    "5. Turkish - Male, Mustafa": {"preset": "v2/tr_speaker_5", "lang": "tr"},
-    "6. Turkish - Female, Asya": {"preset": "v2/tr_speaker_6", "lang": "tr"},
+    "5. Turkish - Female, Ecrin": {"preset": "v2/tr_speaker_5", "lang": "tr"},
+    "6. Turkish - Male, Emir": {"preset": "v2/tr_speaker_6", "lang": "tr"},
     "7. Turkish - Male, Ahmed": {"preset": "v2/tr_speaker_7", "lang": "tr"},
-    "8. Turkish - Female, Defne": {"preset": "v2/tr_speaker_8", "lang": "tr"},
+    "8. Turkish - Male, Kerem": {"preset": "v2/tr_speaker_8", "lang": "tr"},
     "9. Turkish - Male, Ali": {"preset": "v2/tr_speaker_9", "lang": "tr"},
-    "10. Turkish - Female, Miray": {"preset": "v2/tr_speaker_0", "lang": "tr"},
+    "10. Turkish - Male, Eymen": {"preset": "v2/tr_speaker_0", "lang": "tr"},
 
     # --- Hindi (Ấn Độ) ---
     "1. Hindi - Male, Rohan": {"preset": "v2/hi_speaker_1", "lang": "hi"},
@@ -165,16 +165,16 @@ VOICE_PRESETS = {
 CACHE_DIR = "audio_cache"
 
 LANGUAGE_NATIVE_NAMES = {
-    "en": "Anh 🇬🇧",
-    "fr": "Pháp 🇫🇷",
-    "de": "Đức 🇩🇪",
-    "es": "Tây Ban Nha 🇪🇸",
-    "it": "Ý 🇮🇹",
-    "ja": "Nhật Bản 🇯🇵",
-    "ko": "Hàn Quốc 🇰🇷",
-    "zh": "Trung Quốc 🇨🇳",
-    "pt": "Bồ Đào Nha 🇵🇹",
-    "ru": "Nga 🇷🇺",
-    "tr": "Thổ Nhĩ Kỳ 🇹🇷",
-    "hi": "Ấn Độ 🇮🇳",
+    "en": "🇬🇧 Anh 🇬🇧",
+    "fr": "🇫🇷 Pháp 🇫🇷",
+    "de": "🇩🇪 Đức 🇩🇪",
+    "es": "🇪🇸 Tây Ban Nha 🇪🇸",
+    "it": "🇮🇹 Ý 🇮🇹",
+    "ja": "🇯🇵 Nhật Bản 🇯🇵",
+    "ko": "🇰🇷 Hàn Quốc 🇰🇷",
+    "zh": "🇨🇳 Trung Quốc 🇨🇳",
+    "pt": "🇵🇹 Bồ Đào Nha 🇵🇹",
+    "ru": "🇷🇺 Nga 🇷🇺",
+    "tr": "🇹🇷 Thổ Nhĩ Kỳ 🇹🇷",
+    "hi": "🇮🇳 Ấn Độ 🇮🇳",
 }
