@@ -40,8 +40,8 @@ def display_main_menu():
         
     print(f"{VERSION.center(terminal_width)}")
     print("\n" + "=" * terminal_width)
-    print("1. Nghe thử các giọng nói (Box Voice)")
+    print("1. Nghe thử giọng nói (Box Voice)")
     print("2. Tạo âm thanh")
     print("3. Kiểm tra phần cứng (CPU/GPU)")
-    print("4. Thoát chương trình")
+    print("0. Thoát chương trình")
     print("=" * terminal_width)

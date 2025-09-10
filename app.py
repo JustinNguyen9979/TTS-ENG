@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 from config import CACHE_DIR
 from tts_utils import load_models
-from jukebox import run_jukebox
+from box_voice import run_boxvoice
 from file_tts import run_file_tts
 from hardware_check import run_hardware_check
 from ui import display_main_menu
@@ -39,15 +39,15 @@ def main_menu():
         while True:
             display_main_menu()
             
-            choice = input("Nhập lựa chọn của bạn (1-4): ")
+            choice = input("Nhập lựa chọn của bạn (0-3): ")
 
             if choice == '1':
-                run_jukebox(model, processor, device, sampling_rate)
+                run_boxvoice(model, processor, device, sampling_rate)
             elif choice == '2':
                 run_file_tts(model, processor, device, sampling_rate)
             elif choice == '3':
                 run_hardware_check()
-            elif choice == '4':
+            elif choice == '0':
                 print("Tạm biệt!")
                 sys.exit(0)
             else:
