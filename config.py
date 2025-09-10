@@ -49,7 +49,7 @@ VOICE_PRESETS = {
 
     # --- German (21-30) ---
     "21. German - Male, Lukas": {"preset": "v2/de_speaker_1", "lang": "de"},
-    "22. German - Female, Mia": {"preset": "v2/de_speaker_2", "lang": "de"},
+    "22. German - Male, Maximilian": {"preset": "v2/de_speaker_2", "lang": "de"},
     "23. German - Male, Leon": {"preset": "v2/de_speaker_3", "lang": "de"},
     "24. German - Female, Hanna": {"preset": "v2/de_speaker_4", "lang": "de"},
     "25. German - Male, Finn": {"preset": "v2/de_speaker_5", "lang": "de"},
