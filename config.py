@@ -61,15 +61,15 @@ VOICE_PRESETS = {
 
     # --- Spanish (31-40) (Tây Ban Nha) ---
     "31. Spanish - Male, Santiago": {"preset": "v2/es_speaker_1", "lang": "es"},
-    "32. Spanish - Female, Sofía": {"preset": "v2/es_speaker_2", "lang": "es"},
+    "32. Spanish - Male, Javier": {"preset": "v2/es_speaker_2", "lang": "es"},
     "33. Spanish - Male, Mateo": {"preset": "v2/es_speaker_3", "lang": "es"},
-    "34. Spanish - Female, Valentina": {"preset": "v2/es_speaker_4", "lang": "es"},
+    "34. Spanish - Male, Daniel": {"preset": "v2/es_speaker_4", "lang": "es"},
     "35. Spanish - Male, Alejandro": {"preset": "v2/es_speaker_5", "lang": "es"},
-    "36. Spanish - Female, Isabella": {"preset": "v2/es_speaker_6", "lang": "es"},
+    "36. Spanish - Male, Manuel": {"preset": "v2/es_speaker_6", "lang": "es"},
     "37. Spanish - Male, Sebastián": {"preset": "v2/es_speaker_7", "lang": "es"},
     "38. Spanish - Female, Camila": {"preset": "v2/es_speaker_8", "lang": "es"},
-    "39. Spanish - Male, Diego": {"preset": "v2/es_speaker_9", "lang": "es"},
-    "40. Spanish - Female, Martina": {"preset": "v2/es_speaker_0", "lang": "es"},
+    "39. Spanish - Female, Elena": {"preset": "v2/es_speaker_9", "lang": "es"},
+    "40. Spanish - Male, Adrián": {"preset": "v2/es_speaker_0", "lang": "es"},
 
     # --- Italian (41-50) (Ý) ---
     "41. Italian - Male, Leonardo": {"preset": "v2/it_speaker_1", "lang": "it"},
