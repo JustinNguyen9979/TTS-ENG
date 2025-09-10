@@ -151,14 +151,14 @@ VOICE_PRESETS = {
 
     # --- Hindi (Ấn Độ) ---
     "1. Hindi - Male, Rohan": {"preset": "v2/hi_speaker_1", "lang": "hi"},
-    "2. Hindi - Female, Diya": {"preset": "v2/hi_speaker_2", "lang": "hi"},
-    "3. Hindi - Male, Arjun": {"preset": "v2/hi_speaker_3", "lang": "hi"},
+    "2. Hindi - Male, Kabir": {"preset": "v2/hi_speaker_2", "lang": "hi"},
+    "3. Hindi - Female, Diya": {"preset": "v2/hi_speaker_3", "lang": "hi"},
     "4. Hindi - Female, Priya": {"preset": "v2/hi_speaker_4", "lang": "hi"},
     "5. Hindi - Male, Aarav": {"preset": "v2/hi_speaker_5", "lang": "hi"},
-    "6. Hindi - Female, Anika": {"preset": "v2/hi_speaker_6", "lang": "hi"},
+    "6. Hindi - Male, Ishaan": {"preset": "v2/hi_speaker_6", "lang": "hi"},
     "7. Hindi - Male, Vivaan": {"preset": "v2/hi_speaker_7", "lang": "hi"},
-    "8. Hindi - Female, Saanvi": {"preset": "v2/hi_speaker_8", "lang": "hi"},
-    "9. Hindi - Male, Aditya": {"preset": "v2/hi_speaker_9", "lang": "hi"},
+    "8. Hindi - Male, Reyan": {"preset": "v2/hi_speaker_8", "lang": "hi"},
+    "9. Hindi - Female, Tara": {"preset": "v2/hi_speaker_9", "lang": "hi"},
     "10. Hindi - Female, Zara": {"preset": "v2/hi_speaker_0", "lang": "hi"},
 }
 
