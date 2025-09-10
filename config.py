@@ -36,16 +36,16 @@ VOICE_PRESETS = {
 
 
     # --- French (11-20) (Pháp) ---
-    "11. French - Male, Louis": {"preset": "v2/fr_speaker_1", "lang": "fr"},
+    "11. French - Female, Alice": {"preset": "v2/fr_speaker_1", "lang": "fr"},
     "12. French - Female, Léa": {"preset": "v2/fr_speaker_2", "lang": "fr"},
     "13. French - Male, Jules": {"preset": "v2/fr_speaker_3", "lang": "fr"},
-    "14. French - Female, Louise": {"preset": "v2/fr_speaker_4", "lang": "fr"},
-    "15. French - Male, Gabriel": {"preset": "v2/fr_speaker_5", "lang": "fr"},
-    "16. French - Female, Chloé": {"preset": "v2/fr_speaker_6", "lang": "fr"},
+    "14. French - Male, Ethan": {"preset": "v2/fr_speaker_4", "lang": "fr"},
+    "15. French - Female, Louise": {"preset": "v2/fr_speaker_5", "lang": "fr"},
+    "16. French - Male, Hugo": {"preset": "v2/fr_speaker_6", "lang": "fr"},
     "17. French - Male, Léo": {"preset": "v2/fr_speaker_7", "lang": "fr"},
-    "18. French - Female, Charlotte": {"preset": "v2/fr_speaker_8", "lang": "fr"},
+    "18. French - Male, Lucas": {"preset": "v2/fr_speaker_8", "lang": "fr"},
     "19. French - Male, Raphaël": {"preset": "v2/fr_speaker_9", "lang": "fr"},
-    "20. French - Female, Emma": {"preset": "v2/fr_speaker_0", "lang": "fr"},
+    "20. French - Male, Nathan": {"preset": "v2/fr_speaker_0", "lang": "fr"},
 
     # --- German (21-30) (Đức) ---
     "21. German - Male, Lukas": {"preset": "v2/de_speaker_1", "lang": "de"},

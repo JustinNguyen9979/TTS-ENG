@@ -51,28 +51,6 @@ def run_file_tts(model, processor, device, sampling_rate):
         
         # 2. HỎI GIỌNG ĐỌC MỘT LẦN
         print(f"\nĐã tìm thấy {len(initial_files)} file.")
-        # print("\nChọn một giọng nói:")
-        # for display_name in VOICE_PRESETS.keys():
-        #     print(f"  {display_name}")
-        # print("  0. Quay lại menu chính")
-        
-        # voice_preset, lang_code, voice_name_part = None, None, None
-        # while True:
-        #     choice = input("\nNhập lựa chọn của bạn (0 để quay lại): ")
-        #     if choice == '0': return
-
-        #     try:
-        #         choice_num = int(choice)
-        #         if 1 <= choice_num <= len(VOICE_PRESETS):
-        #             selected_display_name = list(VOICE_PRESETS.keys())[choice_num - 1]
-        #             voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
-        #             lang_code = VOICE_PRESETS[selected_display_name]["lang"]
-        #             voice_name_part = "".join(re.findall(r'\b\w', selected_display_name.split('-')[1]))
-        #             break
-        #         else: print("Lựa chọn không hợp lệ!")
-        #     except (ValueError, IndexError):
-        #         print("Lựa chọn không hợp lệ!")
-        # THAY BẰNG KHỐI CODE NÀY
         print("\nChọn giọng nói:")
         
         display_voice_menu_grid(VOICE_PRESETS)
