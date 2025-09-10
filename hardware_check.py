@@ -1,5 +1,3 @@
-# hardware_check.py
-
 import torch
 import os
 import psutil
@@ -14,7 +12,6 @@ except ImportError:
     NVML_AVAILABLE = False
 
 def get_system_specs():
-    # ... (Hàm này giữ nguyên, không cần thay đổi) ...
     specs = {}
     cpu_info = get_cpu_info()
     specs['cpu_model'] = cpu_info.get('brand_raw', 'Không xác định')
@@ -51,7 +48,6 @@ def get_system_specs():
     return specs
 
 def evaluate_specs(specs):
-    # ... (Hàm này giữ nguyên, không cần thay đổi) ...
     failure_reasons = []
     if specs['ram_total_gb'] < MIN_RAM_GB:
         failure_reasons.append(f"- RAM hệ thống ({specs['ram_total_gb']}GB) thấp hơn yêu cầu ({MIN_RAM_GB}GB).")
@@ -65,12 +61,9 @@ def run_hardware_check():
     clear_screen()
     print(generate_centered_ascii_title("Hardware Check", font='small'))
     
-    # print("\nĐang thu thập thông tin hệ thống...")
     specs = get_system_specs()
     is_sufficient, reasons = evaluate_specs(specs)
     
-    # NÂNG CẤP: Logic hiển thị hộp thông tin với căn lề trái
-    # 1. Tạo một danh sách các cặp (label, value)
     info_data = [
         ('CPU', f"{specs['cpu_model']} ({specs['cpu_cores']} cores)"),
         ('RAM', f"{specs['ram_total_gb']} GB (Khả dụng: {specs['ram_available_gb']} GB)"),
@@ -80,33 +73,27 @@ def run_hardware_check():
         info_data.append(('VRAM', f"{specs['gpu_vram_total_gb']} GB"))
         info_data.append(('Nền tảng', f"{specs['compute_platform']}"))
 
-    # 2. Tìm chiều dài của label dài nhất để căn chỉnh
     label_width = max(len(label) for label, value in info_data)
 
-    # 3. Tạo các dòng đã được định dạng với các dấu hai chấm thẳng hàng
     formatted_lines = [f"{label.ljust(label_width)} : {value}" for label, value in info_data]
     
-    # 4. Tìm chiều dài của dòng dài nhất trong các dòng đã định dạng
     max_line_length = max(len(line) for line in formatted_lines)
     title = "--- THÔNG TIN HỆ THỐNG ---"
-    # Đảm bảo đường viền đủ dài cho cả tiêu đề và nội dung
     box_width = max(max_line_length, len(title))
     
-    # 5. Tạo đường viền và in ra hộp thông tin
-    dash_line = "-" * (box_width + 4) # Thêm padding 2 bên
+    dash_line = "-" * (box_width + 4) 
 
     print(f"\n{dash_line}")
     print(title.center(len(dash_line)))
     for line in formatted_lines:
         # In mỗi dòng với 2 khoảng trắng đệm ở bên trái
-        print(f"  {line}")
+        print(f"\n  {line}")
     print(dash_line)
     
-    # Các phần còn lại giữ nguyên
     print(f"\n➡️ Chương trình ưu tiên sử dụng: {specs['active_device'].upper()}")
 
     if is_sufficient:
-        result_text = ">>> MÁY TÍNH ĐỦ ĐIỀU KIỆN ĐỂ CHẠY <<<"
+        result_text = ">>> MÁY TÍNH ĐỦ ĐIỀU KIỆN <<<"
     else:
         result_text = ">>> MÁY TÍNH KHÔNG ĐỦ ĐIỀU KIỆN <<<"
         

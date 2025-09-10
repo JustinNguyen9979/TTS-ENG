@@ -1,5 +1,3 @@
-# file_tts.py
-
 import os
 import sys
 import re
@@ -15,7 +13,6 @@ from box_voice import display_voice_menu_grid
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-# NÂNG CẤP: Hàm tự động tìm file .txt trong thư mục 'Input'
 def find_and_sort_input_files():
     """
     Tìm file TXT trong Folder Input.

@@ -1,5 +1,3 @@
-# jukebox.py
-
 import os
 import sys
 from scipy.io.wavfile import write, read
@@ -11,7 +9,6 @@ import time
 from ui import clear_screen, generate_centered_ascii_title
 import re
 
-# NÂNG CẤP: HÀM VẼ MENU DẠNG CỘT PHIÊN BẢN HOÀN THIỆN
 def display_voice_menu_grid(presets):
     try:
         terminal_width = os.get_terminal_size().columns

@@ -1,15 +1,11 @@
-# ui.py
-
 import os
 import pyfiglet
 
-VERSION = "v5.0 - Edit By Justin Nguyen"
+VERSION = "v1.0.0 - Developed By Justin Nguyen 🇻🇳"
 
 def clear_screen():
-    """Xóa màn hình terminal."""
     os.system('cls' if os.name == 'nt' else 'clear')
 
-# NÂNG CẤP: Logic căn giữa đã được thêm vào
 def generate_centered_ascii_title(text, font='standard'):
     try:
         terminal_width = os.get_terminal_size().columns
@@ -26,9 +22,6 @@ def generate_centered_ascii_title(text, font='standard'):
     return centered_banner
 
 def display_main_menu():
-    """
-    Hàm chuyên dụng để hiển thị menu chính, bao gồm cả banner động.
-    """
     clear_screen()
     
     print(generate_centered_ascii_title("TOOL TEXT TO SPEECH"))
@@ -40,8 +33,9 @@ def display_main_menu():
         
     print(f"{VERSION.center(terminal_width)}")
     print("\n" + "=" * terminal_width)
-    print("1. Nghe thử giọng nói (Box Voice)")
-    print("2. Tạo giọng nói (Text To Speech)")
-    print("3. Kiểm tra phần cứng (Check CPU/GPU)")
-    print("0. Thoát chương trình (Exit)")
-    print("=" * terminal_width)
+    print("\n1. Nghe thử giọng nói (Box Voice)")
+    print("\n2. Tạo giọng nói (Text To Speech)")
+    print("\n3. Kiểm tra phần cứng (Check CPU/GPU)")
+    print("\n4. Thông tin & Tác giả (About)")
+    print("\n0. Thoát chương trình (Exit)")
+    print("\n" + "=" * terminal_width)

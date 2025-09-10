@@ -1,5 +1,3 @@
-# tts_utils.py
-
 import torch
 from transformers import AutoProcessor, BarkModel, logging as hf_logging
 
@@ -8,7 +6,6 @@ def load_models():
     # Tắt các cảnh báo không cần thiết
     hf_logging.set_verbosity_error()
 
-    # Cài đặt thiết bị
     device = "cuda" if torch.cuda.is_available() else "cpu"
     if torch.backends.mps.is_available():
         device = "mps"
