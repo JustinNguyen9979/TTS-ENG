@@ -2,12 +2,17 @@
 
 import sys
 import os
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 from config import CACHE_DIR
 from tts_utils import load_models
 from jukebox import run_jukebox
 from file_tts import run_file_tts
 from hardware_check import run_hardware_check
 from ui import display_main_menu
+
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')

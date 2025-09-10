@@ -147,16 +147,22 @@ def run_file_tts(model, processor, device, sampling_rate):
                     print(f"\n-> Phát hiện file mới: {os.path.basename(new_file)}.")
                     files_to_process.append(new_file) # Thêm vào cuối hàng đợi
 
-        # KHI VÒNG LẶP KẾT THÚC (HÀNG ĐỢI RỖNG)
-        print("\n-" * 60)
-        print("✅ XUẤT FILE AUDIO THÀNH CÔNG!")
+        try:
+            terminal_width = os.get_terminal_size().columns
+        except OSError:
+            terminal_width = 80 # Giá trị mặc định
+            
+        dash_line = "-" * terminal_width
+
+        print(f"\n{dash_line}")
+        print("✅ XUẤT FILE AUDIO THÀNH CÔNG!".center(terminal_width))
         if processed_files_log:
-            print("Các file sau đã được tạo thành công:")
+            print("\nCác file audio đã được tạo thành công:".center(terminal_width))
             for log_entry in processed_files_log:
                 print(f"  - {log_entry}")
         else:
-            print("Không có file nào được xử lý thành công.")
-        print("-" * 60)
+            print("Không có file audio nào được xử lý thành công.".center(terminal_width))
+        print(dash_line)
         
     except KeyboardInterrupt:
         print("\n\nĐã dừng xử lý. Đang quay lại menu chính...")

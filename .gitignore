@@ -1,4 +1,3 @@
-*.wav
 __cache__/
 venv/
 __pycache__/
