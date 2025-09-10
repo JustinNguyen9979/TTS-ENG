@@ -121,15 +121,15 @@ VOICE_PRESETS = {
 
     # --- Portuguese (81-90) (Bồ Đào Nha) ---
     "81. Portuguese - Male, João": {"preset": "v2/pt_speaker_1", "lang": "pt"},
-    "82. Portuguese - Female, Maria": {"preset": "v2/pt_speaker_2", "lang": "pt"},
+    "82. Portuguese - Male, Lucas": {"preset": "v2/pt_speaker_2", "lang": "pt"},
     "83. Portuguese - Male, Miguel": {"preset": "v2/pt_speaker_3", "lang": "pt"},
-    "84. Portuguese - Female, Alice": {"preset": "v2/pt_speaker_4", "lang": "pt"},
+    "84. Portuguese - Male, Gabriel": {"preset": "v2/pt_speaker_4", "lang": "pt"},
     "85. Portuguese - Male, Arthur": {"preset": "v2/pt_speaker_5", "lang": "pt"},
-    "86. Portuguese - Female, Helena": {"preset": "v2/pt_speaker_6", "lang": "pt"},
+    "86. Portuguese - Male, Rafael": {"preset": "v2/pt_speaker_6", "lang": "pt"},
     "87. Portuguese - Male, Heitor": {"preset": "v2/pt_speaker_7", "lang": "pt"},
-    "88. Portuguese - Female, Laura": {"preset": "v2/pt_speaker_8", "lang": "pt"},
+    "88. Portuguese - Male, Matheus": {"preset": "v2/pt_speaker_8", "lang": "pt"},
     "89. Portuguese - Male, Davi": {"preset": "v2/pt_speaker_9", "lang": "pt"},
-    "90. Portuguese - Female, Manuela": {"preset": "v2/pt_speaker_0", "lang": "pt"},
+    "90. Portuguese - Male, Gustavo": {"preset": "v2/pt_speaker_0", "lang": "pt"},
 
     # --- Russian (91-100) (Nga) ---
     "91. Russian - Male, Alexander": {"preset": "v2/ru_speaker_1", "lang": "ru"},
