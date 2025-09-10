@@ -97,13 +97,13 @@ VOICE_PRESETS = {
 
     # --- Korean (61-70) (Hàn Quốc) ---
     "61. Korean - Male, Ji-ho": {"preset": "v2/ko_speaker_1", "lang": "ko"},
-    "62. Korean - Female, Ji-woo": {"preset": "v2/ko_speaker_2", "lang": "ko"},
+    "62. Korean - Male, Ye-jun": {"preset": "v2/ko_speaker_2", "lang": "ko"},
     "63. Korean - Male, Min-jun": {"preset": "v2/ko_speaker_3", "lang": "ko"},
-    "64. Korean - Female, Seo-yeon": {"preset": "v2/ko_speaker_4", "lang": "ko"},
+    "64. Korean - Male, Eun-woo": {"preset": "v2/ko_speaker_4", "lang": "ko"},
     "65. Korean - Male, Seo-joon": {"preset": "v2/ko_speaker_5", "lang": "ko"},
-    "66. Korean - Female, Ha-yoon": {"preset": "v2/ko_speaker_6", "lang": "ko"},
+    "66. Korean - Male, Si-woo": {"preset": "v2/ko_speaker_6", "lang": "ko"},
     "67. Korean - Male, Do-yun": {"preset": "v2/ko_speaker_7", "lang": "ko"},
-    "68. Korean - Female, Seo-ah": {"preset": "v2/ko_speaker_8", "lang": "ko"},
+    "68. Korean - Male, Jeong-woo": {"preset": "v2/ko_speaker_8", "lang": "ko"},
     "69. Korean - Male, Ha-joon": {"preset": "v2/ko_speaker_9", "lang": "ko"},
     "70. Korean - Female, Ji-an": {"preset": "v2/ko_speaker_0", "lang": "ko"},
 
