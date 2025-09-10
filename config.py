@@ -172,16 +172,16 @@ VOICE_PRESETS = {
 CACHE_DIR = "audio_cache"
 
 LANGUAGE_NATIVE_NAMES = {
-    "en": "Anh",
-    "fr": "Pháp",
-    "de": "Đức",
-    "es": "Tây Ban Nha",
-    "it": "Ý",
-    "ja": "Nhật",
-    "ko": "Hàn Quốc",
-    "zh": "Trung Quốc",
-    "pt": "Bồ Đào Nha",
-    "ru": "Nga",
-    "tr": "Thổ Nhĩ Kỳ",
-    "hi": "Ấn Độ",
+    "en": "Anh 🇬🇧",
+    "fr": "Pháp 🇫🇷",
+    "de": "Đức 🇩🇪",
+    "es": "Tây Ban Nha 🇪🇸",
+    "it": "Ý 🇮🇹",
+    "ja": "Nhật Bản 🇯🇵",
+    "ko": "Hàn Quốc 🇰🇷",
+    "zh": "Trung Quốc 🇨🇳",
+    "pt": "Bồ Đào Nha 🇵🇹",
+    "ru": "Nga 🇷🇺",
+    "tr": "Thổ Nhĩ Kỳ 🇹🇷",
+    "hi": "Ấn Độ 🇮🇳",
 }
