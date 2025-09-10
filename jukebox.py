@@ -38,7 +38,7 @@ def display_voice_menu_grid(presets):
         native_str = f"({native_name})" if native_name else ""
 
         header_text = f" {lang} {range_str} {native_str} "
-        full_header_line = header_text.center(terminal_width, '-')
+        full_header_line = header_text.center(terminal_width, '*')
         print(f"\n{full_header_line}")
         
         max_len = max(len(v) for v in voices) + 4

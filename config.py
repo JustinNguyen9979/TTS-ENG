@@ -29,7 +29,7 @@ VOICE_PRESETS = {
     "4. English - Male, Charles": {"preset": "v2/en_speaker_4", "lang": "en"},
     "5. English - Male, Brian": {"preset": "v2/en_speaker_5", "lang": "en"}, 
     "6. English - Male, Arthur": {"preset": "v2/en_speaker_6", "lang": "en"},
-    "7. English - Female, Aurora": {"preset": "v2/en_speaker_7", "lang": "en"},
+    "7. English - Male, Oliver": {"preset": "v2/en_speaker_7", "lang": "en"},
     "8. English - Male, Felix": {"preset": "v2/en_speaker_8", "lang": "en"},
     "9. English - Female, Venus": {"preset": "v2/en_speaker_9", "lang": "en"},
     "10. English - Male, Theodore": {"preset": "v2/en_speaker_0", "lang": "en"},

@@ -10,6 +10,7 @@ from tts_utils import generate_audio_chunk
 from tqdm import tqdm
 import time
 from ui import clear_screen, generate_centered_ascii_title
+from jukebox import display_voice_menu_grid
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -49,12 +50,34 @@ def run_file_tts(model, processor, device, sampling_rate):
             return
         
         # 2. HỎI GIỌNG ĐỌC MỘT LẦN
-        print(f"\nĐã tìm thấy {len(initial_files)} file. Các file sẽ được xử lý theo thứ tự.")
-        print("\nChọn một giọng nói:")
-        for display_name in VOICE_PRESETS.keys():
-            print(f"  {display_name}")
-        print("  0. Quay lại menu chính")
+        print(f"\nĐã tìm thấy {len(initial_files)} file.")
+        # print("\nChọn một giọng nói:")
+        # for display_name in VOICE_PRESETS.keys():
+        #     print(f"  {display_name}")
+        # print("  0. Quay lại menu chính")
         
+        # voice_preset, lang_code, voice_name_part = None, None, None
+        # while True:
+        #     choice = input("\nNhập lựa chọn của bạn (0 để quay lại): ")
+        #     if choice == '0': return
+
+        #     try:
+        #         choice_num = int(choice)
+        #         if 1 <= choice_num <= len(VOICE_PRESETS):
+        #             selected_display_name = list(VOICE_PRESETS.keys())[choice_num - 1]
+        #             voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
+        #             lang_code = VOICE_PRESETS[selected_display_name]["lang"]
+        #             voice_name_part = "".join(re.findall(r'\b\w', selected_display_name.split('-')[1]))
+        #             break
+        #         else: print("Lựa chọn không hợp lệ!")
+        #     except (ValueError, IndexError):
+        #         print("Lựa chọn không hợp lệ!")
+        # THAY BẰNG KHỐI CODE NÀY
+        print("\nChọn giọng nói:")
+        
+        display_voice_menu_grid(VOICE_PRESETS)
+        print("\n  0. Quay lại menu chính")
+
         voice_preset, lang_code, voice_name_part = None, None, None
         while True:
             choice = input("\nNhập lựa chọn của bạn (0 để quay lại): ")
@@ -62,17 +85,18 @@ def run_file_tts(model, processor, device, sampling_rate):
 
             try:
                 choice_num = int(choice)
-                if 1 <= choice_num <= len(VOICE_PRESETS):
-                    selected_display_name = list(VOICE_PRESETS.keys())[choice_num - 1]
+                selected_display_name = next((key for key in VOICE_PRESETS.keys() if key.startswith(f"{choice_num}. ")), None)
+                
+                if selected_display_name:
                     voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
                     lang_code = VOICE_PRESETS[selected_display_name]["lang"]
                     voice_name_part = "".join(re.findall(r'\b\w', selected_display_name.split('-')[1]))
                     break
-                else: print("Lựa chọn không hợp lệ!")
+                else:
+                    print("Lựa chọn không hợp lệ!")
             except (ValueError, IndexError):
                 print("Lựa chọn không hợp lệ!")
 
-        # NÂNG CẤP: LOGIC HÀNG ĐỢI (QUEUE)
         files_to_process = initial_files.copy() # Tạo một bản sao để làm hàng đợi
         processed_files_log = [] # Lưu lại log các file đã xử lý thành công
         processed_files_set = set() # Dùng để kiểm tra file đã xử lý chưa một cách nhanh chóng
@@ -85,7 +109,14 @@ def run_file_tts(model, processor, device, sampling_rate):
             if file_path in processed_files_set:
                 continue
 
-            print(f"\n--- Bắt đầu xử lý file: {os.path.basename(file_path)} ---")
+            try:
+                terminal_width = os.get_terminal_size().columns
+            except OSError:
+                terminal_width = 80 # Giá trị mặc định
+
+            header_text = f" Bắt đầu xử lý file: {os.path.basename(file_path)} "
+            full_header_line = header_text.center(terminal_width, '-')
+            print(f"\n{full_header_line}")
             
             try:
                 with open(file_path, 'r', encoding='utf-8') as f:
@@ -117,7 +148,6 @@ def run_file_tts(model, processor, device, sampling_rate):
                 pieces.append(pause_samples)
 
             if not pieces:
-                # Trường hợp này hiếm khi xảy ra nếu đã kiểm tra file rỗng, nhưng để dự phòng
                 print(f"⚠️ Cảnh báo: File '{os.path.basename(file_path)}' rỗng. Bỏ qua.")
                 processed_files_set.add(file_path)
                 continue
@@ -133,7 +163,6 @@ def run_file_tts(model, processor, device, sampling_rate):
             
             write(output_filepath, sampling_rate, final_audio_data)
             
-            # Ghi nhận kết quả
             processed_files_log.append(output_filename)
             processed_files_set.add(file_path)
 
