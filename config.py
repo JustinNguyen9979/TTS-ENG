@@ -22,7 +22,7 @@ TEXT_SAMPLES = {
 
 # Danh sách các giọng nói có sẵn
 VOICE_PRESETS = {
-    # --- English (1-10) ---
+    # --- English (1-10) (Anh) ---
     "1. English - Male, Drake": {"preset": "v2/en_speaker_1", "lang": "en"},
     "2. English - Male, James": {"preset": "v2/en_speaker_2", "lang": "en"},
     "3. English - Male, Henry": {"preset": "v2/en_speaker_3", "lang": "en"},
@@ -35,7 +35,7 @@ VOICE_PRESETS = {
     "10. English - Male, Theodore": {"preset": "v2/en_speaker_0", "lang": "en"},
 
 
-    # --- French (11-20) ---
+    # --- French (11-20) (Pháp) ---
     "11. French - Male, Louis": {"preset": "v2/fr_speaker_1", "lang": "fr"},
     "12. French - Female, Léa": {"preset": "v2/fr_speaker_2", "lang": "fr"},
     "13. French - Male, Jules": {"preset": "v2/fr_speaker_3", "lang": "fr"},
@@ -47,19 +47,19 @@ VOICE_PRESETS = {
     "19. French - Male, Raphaël": {"preset": "v2/fr_speaker_9", "lang": "fr"},
     "20. French - Female, Emma": {"preset": "v2/fr_speaker_0", "lang": "fr"},
 
-    # --- German (21-30) ---
+    # --- German (21-30) (Đức) ---
     "21. German - Male, Lukas": {"preset": "v2/de_speaker_1", "lang": "de"},
     "22. German - Male, Maximilian": {"preset": "v2/de_speaker_2", "lang": "de"},
-    "23. German - Male, Leon": {"preset": "v2/de_speaker_3", "lang": "de"},
-    "24. German - Female, Hanna": {"preset": "v2/de_speaker_4", "lang": "de"},
+    "23. German - Female, Hanna": {"preset": "v2/de_speaker_3", "lang": "de"},
+    "24. German - Male, Leon": {"preset": "v2/de_speaker_4", "lang": "de"},
     "25. German - Male, Finn": {"preset": "v2/de_speaker_5", "lang": "de"},
-    "26. German - Female, Sophie": {"preset": "v2/de_speaker_6", "lang": "de"},
+    "26. German - Male, Felix": {"preset": "v2/de_speaker_6", "lang": "de"},
     "27. German - Male, Paul": {"preset": "v2/de_speaker_7", "lang": "de"},
     "28. German - Female, Emma": {"preset": "v2/de_speaker_8", "lang": "de"},
-    "29. German - Male, Maximilian": {"preset": "v2/de_speaker_9", "lang": "de"},
-    "30. German - Female, Emilia": {"preset": "v2/de_speaker_0", "lang": "de"},
+    "29. German - Male, Noah": {"preset": "v2/de_speaker_9", "lang": "de"},
+    "30. German - Female, Julian": {"preset": "v2/de_speaker_0", "lang": "de"},
 
-    # --- Spanish (31-40) ---
+    # --- Spanish (31-40) (Tây Ban Nha) ---
     "31. Spanish - Male, Santiago": {"preset": "v2/es_speaker_1", "lang": "es"},
     "32. Spanish - Female, Sofía": {"preset": "v2/es_speaker_2", "lang": "es"},
     "33. Spanish - Male, Mateo": {"preset": "v2/es_speaker_3", "lang": "es"},
@@ -71,7 +71,7 @@ VOICE_PRESETS = {
     "39. Spanish - Male, Diego": {"preset": "v2/es_speaker_9", "lang": "es"},
     "40. Spanish - Female, Martina": {"preset": "v2/es_speaker_0", "lang": "es"},
 
-    # --- Italian (41-50) ---
+    # --- Italian (41-50) (Ý) ---
     "41. Italian - Male, Leonardo": {"preset": "v2/it_speaker_1", "lang": "it"},
     "42. Italian - Female, Giulia": {"preset": "v2/it_speaker_2", "lang": "it"},
     "43. Italian - Male, Francesco": {"preset": "v2/it_speaker_3", "lang": "it"},
@@ -83,10 +83,10 @@ VOICE_PRESETS = {
     "49. Italian - Male, Mattia": {"preset": "v2/it_speaker_9", "lang": "it"},
     "50. Italian - Female, Alice": {"preset": "v2/it_speaker_0", "lang": "it"},
 
-    # --- Japanese (51-60) ---
-    "51. Japanese - Male, Haruto": {"preset": "v2/ja_speaker_1", "lang": "ja"},
-    "52. Japanese - Female, Hina": {"preset": "v2/ja_speaker_2", "lang": "ja"},
-    "53. Japanese - Male, Minato": {"preset": "v2/ja_speaker_3", "lang": "ja"},
+    # --- Japanese (51-60) (Nhật Bản) ---
+    "51. Japanese - Female, Akari": {"preset": "v2/ja_speaker_1", "lang": "ja"},
+    "52. Japanese - Male, Kaito": {"preset": "v2/ja_speaker_2", "lang": "ja"},
+    "53. Japanese - Female, Himari": {"preset": "v2/ja_speaker_3", "lang": "ja"},
     "54. Japanese - Female, Sakura": {"preset": "v2/ja_speaker_4", "lang": "ja"},
     "55. Japanese - Male, Sora": {"preset": "v2/ja_speaker_5", "lang": "ja"},
     "56. Japanese - Female, Yui": {"preset": "v2/ja_speaker_6", "lang": "ja"},
@@ -95,7 +95,7 @@ VOICE_PRESETS = {
     "59. Japanese - Male, Yuki": {"preset": "v2/ja_speaker_9", "lang": "ja"},
     "60. Japanese - Female, Aoi": {"preset": "v2/ja_speaker_0", "lang": "ja"},
 
-    # --- Korean (61-70) ---
+    # --- Korean (61-70) (Hàn Quốc) ---
     "61. Korean - Male, Ji-ho": {"preset": "v2/ko_speaker_1", "lang": "ko"},
     "62. Korean - Female, Ji-woo": {"preset": "v2/ko_speaker_2", "lang": "ko"},
     "63. Korean - Male, Min-jun": {"preset": "v2/ko_speaker_3", "lang": "ko"},
@@ -107,7 +107,7 @@ VOICE_PRESETS = {
     "69. Korean - Male, Ha-joon": {"preset": "v2/ko_speaker_9", "lang": "ko"},
     "70. Korean - Female, Ji-an": {"preset": "v2/ko_speaker_0", "lang": "ko"},
 
-    # --- Chinese (Mandarin) (71-80) ---
+    # --- Chinese (71-80) (Trung Quốc) ---
     "71. Chinese - Male, Wei": {"preset": "v2/zh_speaker_1", "lang": "zh"},
     "72. Chinese - Female, Lin": {"preset": "v2/zh_speaker_2", "lang": "zh"},
     "73. Chinese - Male, Jun": {"preset": "v2/zh_speaker_3", "lang": "zh"},
@@ -119,7 +119,7 @@ VOICE_PRESETS = {
     "79. Chinese - Male, Lee": {"preset": "v2/zh_speaker_9", "lang": "zh"},
     "80. Chinese - Female, Jing": {"preset": "v2/zh_speaker_0", "lang": "zh"},
 
-    # --- Portuguese (81-90) ---
+    # --- Portuguese (81-90) (Bồ Đào Nha) ---
     "81. Portuguese - Male, João": {"preset": "v2/pt_speaker_1", "lang": "pt"},
     "82. Portuguese - Female, Maria": {"preset": "v2/pt_speaker_2", "lang": "pt"},
     "83. Portuguese - Male, Miguel": {"preset": "v2/pt_speaker_3", "lang": "pt"},
@@ -131,7 +131,7 @@ VOICE_PRESETS = {
     "89. Portuguese - Male, Davi": {"preset": "v2/pt_speaker_9", "lang": "pt"},
     "90. Portuguese - Female, Manuela": {"preset": "v2/pt_speaker_0", "lang": "pt"},
 
-    # --- Russian (91-100) ---
+    # --- Russian (91-100) (Nga) ---
     "91. Russian - Male, Alexander": {"preset": "v2/ru_speaker_1", "lang": "ru"},
     "92. Russian - Female, Anastasia": {"preset": "v2/ru_speaker_2", "lang": "ru"},
     "93. Russian - Male, Ivan": {"preset": "v2/ru_speaker_3", "lang": "ru"},
@@ -143,7 +143,7 @@ VOICE_PRESETS = {
     "99. Russian - Male, Artem": {"preset": "v2/ru_speaker_9", "lang": "ru"},
     "100. Russian - Female, Victoria": {"preset": "v2/ru_speaker_0", "lang": "ru"},
 
-    # --- Turkish (101-110) ---
+    # --- Turkish (101-110) (Thổ Nhỹ Kỳ) ---
     "101. Turkish - Male, Yusuf": {"preset": "v2/tr_speaker_1", "lang": "tr"},
     "102. Turkish - Female, Zeynep": {"preset": "v2/tr_speaker_2", "lang": "tr"},
     "103. Turkish - Male, Mehmet": {"preset": "v2/tr_speaker_3", "lang": "tr"},
@@ -155,7 +155,7 @@ VOICE_PRESETS = {
     "109. Turkish - Male, Ali": {"preset": "v2/tr_speaker_9", "lang": "tr"},
     "110. Turkish - Female, Miray": {"preset": "v2/tr_speaker_0", "lang": "tr"},
 
-    # --- Hindi (111-120) ---
+    # --- Hindi (111-120) (Ấn Độ) ---
     "111. Hindi - Male, Rohan": {"preset": "v2/hi_speaker_1", "lang": "hi"},
     "112. Hindi - Female, Diya": {"preset": "v2/hi_speaker_2", "lang": "hi"},
     "113. Hindi - Male, Arjun": {"preset": "v2/hi_speaker_3", "lang": "hi"},
@@ -171,3 +171,17 @@ VOICE_PRESETS = {
 # Tên thư mục cache
 CACHE_DIR = "audio_cache"
 
+LANGUAGE_NATIVE_NAMES = {
+    "en": "Anh",
+    "fr": "Pháp",
+    "de": "Đức",
+    "es": "Tây Ban Nha",
+    "it": "Ý",
+    "ja": "Nhật",
+    "ko": "Hàn Quốc",
+    "zh": "Trung Quốc",
+    "pt": "Bồ Đào Nha",
+    "ru": "Nga",
+    "tr": "Thổ Nhĩ Kỳ",
+    "hi": "Ấn Độ",
+}
