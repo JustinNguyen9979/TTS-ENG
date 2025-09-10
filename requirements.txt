@@ -1,11 +1,11 @@
-
-torch 
-transformers 
-sounddevice 
-numpy 
-tqdm 
+torch
+transformers
+sounddevice
+numpy
+tqdm
 pydub
 pyfiglet
 psutil
 pynvml
 py-cpuinfo
+tk
