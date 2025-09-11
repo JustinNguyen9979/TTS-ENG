@@ -89,3 +89,20 @@ project_voice/
 ├── app.py                # Điểm khởi đầu của ứng dụng
 └── requirements.txt      # Danh sách các thư viện cần thiết
 ```
+
+---
+## ❤️ Ủng Hộ Tác Giả
+
+Công cụ này được phát triển và duy trì hoàn toàn miễn phí. Nếu bạn thấy nó hữu ích và muốn hỗ trợ tác giả để có thêm động lực phát triển các dự án mã nguồn mở khác, bạn có thể ủng hộ qua các kênh dưới đây. Sự ủng hộ của bạn, dù nhỏ, cũng là một nguồn động viên to lớn.
+
+Xin chân thành cảm ơn!
+
+| Kênh | Thông Tin |
+| :--- | :--- |
+| 🏦 **MB Bank** | **STK:** `079 88888 88888` <br> **Tên:** NGUYEN DUC HUY |
+| 📱 **Momo** | `0982 579 098` |
+| 🌐 **PayPal** | KZN2CVN5QM9EN |
+
+## 📬 Thông Tin Liên Lạc
+
+- **Telegram:** [@Justin_Nguyen_SG](https://t.me/Justin_Nguyen_SG)
