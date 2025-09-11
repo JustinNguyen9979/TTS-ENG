@@ -70,25 +70,6 @@ Sau khi cài đặt thành công, bạn có thể khởi chạy công cụ bằn
       - Hiển thị thông tin về người phát triển và các công nghệ đã được sử dụng.
     - **5. Thoát chương trình.**
 
-## 📂 Cấu Trúc Dự Án
-
-```
-project_voice/
-│
-├── audio_cache/          # Lưu cache 
-├── Input/                # Chứa các file .txt đầu vào
-├── Output/               # Chứa các file .wav đầu ra
-│
-├── config.py             # Cấu hình giọng nói, văn bản mẫu, yêu cầu hệ thống
-├── tts_utils.py          # Các hàm cốt lõi liên quan đến model TTS
-├── box_voice.py          # Logic cho chức năng "Nghe thử"
-├── file_tts.py           # Logic cho chức năng "Xử lý hàng loạt"
-├── hardware_check.py     # Logic cho chức năng "Kiểm tra phần cứng"
-├── ui.py                 # Quản lý giao diện người dùng (banner, menu)
-├── about.py              # Logic cho màn hình "Thông tin tác giả"
-├── app.py                # Điểm khởi đầu của ứng dụng
-└── requirements.txt      # Danh sách các thư viện cần thiết
-```
 
 ---
 ## ❤️ Ủng Hộ Tác Giả
