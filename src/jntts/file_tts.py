@@ -3,28 +3,40 @@ import sys
 import re
 import numpy as np
 from scipy.io.wavfile import write
-from config import VOICE_PRESETS, LANGUAGE_NATIVE_NAMES
-from tts_utils import generate_audio_chunk
+from .config import VOICE_PRESETS, LANGUAGE_NATIVE_NAMES
+from .tts_utils import generate_audio_chunk
 from tqdm import tqdm
 import time
-from ui import clear_screen, generate_centered_ascii_title
-from box_voice import display_voice_menu_grid
+from .ui import clear_screen, generate_centered_ascii_title
+from .box_voice import display_voice_menu_grid
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def find_and_sort_input_files():
-    """
-    Tìm file TXT trong Folder Input.
-    """
-    input_dir = "Input"
-    # Kiểm tra lại để chắc chắn thư mục tồn tại
+# def find_and_sort_input_files(input_dir_path):
+#     """
+#     Tìm file TXT trong Folder Input.
+#     """
+#     # Kiểm tra lại để chắc chắn thư mục tồn tại
+#     if not os.path.exists(input_dir_path):
+#         os.makedirs(input_dir_path)
+
+#     txt_files = [f for f in os.listdir(input_dir_path) if f.lower().endswith('.txt')]
+        
+#     # Hàm key để sắp xếp: trích xuất số ở đầu tên file
+#     def get_sort_key(filename):
+#         match = re.match(r'(\d+)', filename)
+#         return int(match.group(1)) if match else float('inf')
+
+#     txt_files.sort(key=get_sort_key)
+#     return [os.path.join(input_dir_path, f) for f in txt_files]
+
+def find_and_sort_input_files(input_dir):
     if not os.path.exists(input_dir):
         os.makedirs(input_dir)
-
+    
     txt_files = [f for f in os.listdir(input_dir) if f.lower().endswith('.txt')]
         
-    # Hàm key để sắp xếp: trích xuất số ở đầu tên file
     def get_sort_key(filename):
         match = re.match(r'(\d+)', filename)
         return int(match.group(1)) if match else float('inf')
@@ -32,15 +44,16 @@ def find_and_sort_input_files():
     txt_files.sort(key=get_sort_key)
     return [os.path.join(input_dir, f) for f in txt_files]
 
-def run_file_tts(model, processor, device, sampling_rate):
+def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir):
     try:
         while True:
             clear_screen()
             print(generate_centered_ascii_title("Text To Speech"))
             
-            initial_files = find_and_sort_input_files()
+            initial_files = find_and_sort_input_files(input_dir)
             if not initial_files:
-                print("\n❌ LỖI: Không tìm thấy file .txt nào trong thư mục 'Input'.")
+                print(f"\n❌ LỖI: Không tìm thấy file .txt nào trong thư mục '{input_dir}'.")
+                print("\n   Vui lòng sao chép các file văn bản của bạn vào đó.")
                 input("\nNhấn Enter để quay lại menu chính...")
                 return
             
@@ -139,16 +152,20 @@ def run_file_tts(model, processor, device, sampling_rate):
                                 processed_files_set.add(file_path)
                                 continue
                             final_audio_data = np.concatenate(pieces)
-                            output_dir = "Output"
+
                             if not os.path.exists(output_dir): os.makedirs(output_dir)
                             base_name = os.path.splitext(os.path.basename(file_path))[0]
                             output_filename = f"{base_name}_{lang_code.upper()}_{voice_name_part}.wav"
                             output_filepath = os.path.join(output_dir, output_filename)
+
                             write(output_filepath, sampling_rate, final_audio_data)
+
                             processed_files_log.append(output_filename)
                             processed_files_set.add(file_path)
                             print(f"\n✅ Hoàn tất. Đã lưu tại: {output_filepath}")
-                            current_all_files = find_and_sort_input_files()
+
+                            current_all_files = find_and_sort_input_files(input_dir)
+                            
                             for new_file in current_all_files:
                                 if new_file not in files_to_process and new_file not in processed_files_set:
                                     print(f"-> Phát hiện file mới: {os.path.basename(new_file)}. Thêm vào hàng đợi thành công.")

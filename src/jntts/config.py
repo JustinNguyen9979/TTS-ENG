@@ -162,8 +162,6 @@ VOICE_PRESETS = {
     "10. Hindi - Female, Zara": {"preset": "v2/hi_speaker_0", "lang": "hi"},
 }
 
-CACHE_DIR = "audio_cache"
-
 LANGUAGE_NATIVE_NAMES = {
     "en": "🇬🇧 Anh 🇬🇧",
     "fr": "🇫🇷 Pháp 🇫🇷",

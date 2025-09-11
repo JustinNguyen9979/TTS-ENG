@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jntts-cli"  
+version = "1.0.4" 
+authors = [
+  { name="Justin Nguyen 🇻🇳", email="duchuy_1997@hotmail.com" },
+]
+description = "Một công cụ TTS sử dụng mô hình Bark/Suno để chuyển đổi văn bản thành giọng nói."
+readme = "README.md"  
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Sound/Audio :: Speech"
+]
+
+# PHẦN QUAN TRỌNG NHẤT: Dependencies
+dependencies = [
+    "torch",
+    "transformers",
+    "sounddevice",
+    "numpy",
+    "tqdm",
+    "pydub",
+    "pyfiglet",
+    "psutil",
+    "pynvml",
+    "py-cpuinfo",
+    "appdirs",
+    "scipy",
+    "importlib-resources"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"] 
+include = ["jntts*"]  
+
+[project.scripts]
+jntts-cli = "jntts.main:main"

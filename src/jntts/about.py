@@ -1,5 +1,5 @@
 import os
-from ui import clear_screen, generate_centered_ascii_title
+from .ui import clear_screen, generate_centered_ascii_title
 
 BOX_CHARS = {
     'top_left': '╭',
@@ -18,7 +18,7 @@ def show_about():
 
     tool_credits_data = [
         ("Developed By:", "Justin Nguyen 🇻🇳"),
-        ("Version:", "1.0.0 "),
+        ("Version:", "1.0.4 "),
         ("Date:", "September 2025"),
     ]
     

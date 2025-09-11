@@ -1,7 +1,7 @@
 import os
 import pyfiglet
 
-VERSION = "v1.0.0 - Developed By Justin Nguyen 🇻🇳"
+VERSION = "v1.0.4 - Developed By Justin Nguyen 🇻🇳"
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')

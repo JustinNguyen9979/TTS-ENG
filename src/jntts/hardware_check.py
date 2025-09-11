@@ -2,8 +2,8 @@ import torch
 import os
 import psutil
 from cpuinfo import get_cpu_info
-from config import MIN_RAM_GB, MIN_VRAM_GB
-from ui import generate_centered_ascii_title, clear_screen
+from .config import MIN_RAM_GB, MIN_VRAM_GB
+from .ui import generate_centered_ascii_title, clear_screen
 
 try:
     import pynvml

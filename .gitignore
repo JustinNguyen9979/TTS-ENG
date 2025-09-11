@@ -3,3 +3,9 @@ venv/
 __pycache__/
 Input/
 Output/
+.DS_Store
+dist/
+build/
+*.egg-info/
+requirements.txt
+MANIFEST.in

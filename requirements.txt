@@ -9,3 +9,4 @@ psutil
 pynvml
 py-cpuinfo
 tk
+importlib-resources

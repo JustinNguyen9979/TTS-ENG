@@ -2,11 +2,11 @@ import os
 import sys
 from scipy.io.wavfile import write, read
 import sounddevice as sd
-from config import VOICE_PRESETS, TEXT_SAMPLES, CACHE_DIR, LANGUAGE_NATIVE_NAMES
-from tts_utils import generate_audio_chunk
+from .config import VOICE_PRESETS, TEXT_SAMPLES, LANGUAGE_NATIVE_NAMES
+from .tts_utils import generate_audio_chunk
 from tqdm import tqdm
 import time
-from ui import clear_screen, generate_centered_ascii_title
+from .ui import clear_screen, generate_centered_ascii_title
 import re
 
 def display_voice_menu_grid(presets):
@@ -45,12 +45,35 @@ def display_voice_menu_grid(presets):
             row_items = voices[i:i + num_columns]
             print("".join(item.ljust(max_len) for item in row_items))
 
-def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_rate):
+# def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_rate, cache_dir):
+#     filename = voice_preset_name.replace("/", "_") + ".wav"
+#     filepath = os.path.join(cache_dir, filename)
+#     if os.path.exists(filepath):
+#         rate, audio_data = read(filepath)
+#         return audio_data
+#     selected_voice_info = next(item for item in VOICE_PRESETS.values() if item["preset"] == voice_preset_name)
+#     lang_code = selected_voice_info["lang"]
+#     text_to_speak = TEXT_SAMPLES.get(lang_code, TEXT_SAMPLES["en"])
+#     with tqdm(total=1, desc=f"Đang tạo giọng '{voice_preset_name}'") as pbar:
+#         audio_array = generate_audio_chunk(text_to_speak, voice_preset_name, model, processor, device)
+#         pbar.update(1)
+#     write(filepath, sampling_rate, audio_array)
+#     print(f"\nĐã tạo và lưu audio vào: {filepath}")
+#     return audio_array
+
+def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_rate, cache_dir):
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+        print(f" -> Đã tạo thư mục cache lần đầu tại: {cache_dir}")
+
     filename = voice_preset_name.replace("/", "_") + ".wav"
-    filepath = os.path.join(CACHE_DIR, filename)
+    filepath = os.path.join(cache_dir, filename)
+
     if os.path.exists(filepath):
+        print(f"\nĐang đọc giọng '{voice_preset_name}'")
         rate, audio_data = read(filepath)
         return audio_data
+
     selected_voice_info = next(item for item in VOICE_PRESETS.values() if item["preset"] == voice_preset_name)
     lang_code = selected_voice_info["lang"]
     text_to_speak = TEXT_SAMPLES.get(lang_code, TEXT_SAMPLES["en"])
@@ -61,7 +84,7 @@ def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_r
     print(f"\nĐã tạo và lưu audio vào: {filepath}")
     return audio_array
 
-def run_boxvoice(model, processor, device, sampling_rate):
+def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
     """Chạy vòng lặp menu cho chức năng Jukebox với menu phân cấp."""
     try:
         while True:
@@ -125,7 +148,7 @@ def run_boxvoice(model, processor, device, sampling_rate):
                         
                         if selected_display_name:
                             selected_voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
-                            audio_to_play = get_audio_from_cache(selected_voice_preset, model, processor, device, sampling_rate)
+                            audio_to_play = get_audio_from_cache(selected_voice_preset, model, processor, device, sampling_rate, cache_dir=cache_dir_path)
                             print(f"\nĐang phát giọng: {selected_display_name}")
                             sd.play(audio_to_play, sampling_rate)
                             sd.wait()
