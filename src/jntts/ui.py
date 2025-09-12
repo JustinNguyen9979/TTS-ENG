@@ -1,7 +1,7 @@
 import os
 import pyfiglet
 
-VERSION = "v1.0.4 - Developed By Justin Nguyen 🇻🇳"
+VERSION = "v1.1.0 - Developed By Justin Nguyen 🇻🇳"
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -35,7 +35,8 @@ def display_main_menu():
     print("\n" + "=" * terminal_width)
     print("\n1. Nghe thử giọng nói (Box Voice)")
     print("\n2. Tạo giọng nói (Text To Speech)")
-    print("\n3. Kiểm tra phần cứng (Check CPU/GPU)")
-    print("\n4. Thông tin & Tác giả (About)")
+    print("\n3. Nhân bản giọng nói (Clone Voice)")
+    print("\n4. Kiểm tra phần cứng (Check CPU/GPU)")
+    print("\n5. Thông tin & Tác giả (About)")
     print("\n0. Thoát chương trình (Exit)")
     print("\n" + "=" * terminal_width)

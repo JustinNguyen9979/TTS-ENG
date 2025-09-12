@@ -13,24 +13,6 @@ from .box_voice import display_voice_menu_grid
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-# def find_and_sort_input_files(input_dir_path):
-#     """
-#     Tìm file TXT trong Folder Input.
-#     """
-#     # Kiểm tra lại để chắc chắn thư mục tồn tại
-#     if not os.path.exists(input_dir_path):
-#         os.makedirs(input_dir_path)
-
-#     txt_files = [f for f in os.listdir(input_dir_path) if f.lower().endswith('.txt')]
-        
-#     # Hàm key để sắp xếp: trích xuất số ở đầu tên file
-#     def get_sort_key(filename):
-#         match = re.match(r'(\d+)', filename)
-#         return int(match.group(1)) if match else float('inf')
-
-#     txt_files.sort(key=get_sort_key)
-#     return [os.path.join(input_dir_path, f) for f in txt_files]
-
 def find_and_sort_input_files(input_dir):
     if not os.path.exists(input_dir):
         os.makedirs(input_dir)
@@ -168,7 +150,7 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                             
                             for new_file in current_all_files:
                                 if new_file not in files_to_process and new_file not in processed_files_set:
-                                    print(f"-> Phát hiện file mới: {os.path.basename(new_file)}. Thêm vào hàng đợi thành công.")
+                                    print(f"-> Phát hiện file mới: {os.path.basename(new_file)}. Đợi xử lý.")
                                     files_to_process.append(new_file)
                         
                         # --- KẾT THÚC XỬ LÝ VÀ BÁO CÁO ---

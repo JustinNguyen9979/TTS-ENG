@@ -18,12 +18,12 @@ def show_about():
 
     tool_credits_data = [
         ("Developed By:", "Justin Nguyen 🇻🇳"),
-        ("Version:", "1.0.4 "),
+        ("Version:", "1.1.0 "),
         ("Date:", "September 2025"),
     ]
     
     tech_stack_data = [
-        ("Core AI Model:", "suno/bark by Suno AI"),
+        ("Core AI Model:", "suno/bark by Suno AI. F5-TTS"),
         ("AI Framework:", "PyTorch"),
         ("AI Library:", "Hugging Face Transformers"),
     ]

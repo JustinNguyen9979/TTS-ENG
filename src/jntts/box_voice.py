@@ -45,22 +45,6 @@ def display_voice_menu_grid(presets):
             row_items = voices[i:i + num_columns]
             print("".join(item.ljust(max_len) for item in row_items))
 
-# def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_rate, cache_dir):
-#     filename = voice_preset_name.replace("/", "_") + ".wav"
-#     filepath = os.path.join(cache_dir, filename)
-#     if os.path.exists(filepath):
-#         rate, audio_data = read(filepath)
-#         return audio_data
-#     selected_voice_info = next(item for item in VOICE_PRESETS.values() if item["preset"] == voice_preset_name)
-#     lang_code = selected_voice_info["lang"]
-#     text_to_speak = TEXT_SAMPLES.get(lang_code, TEXT_SAMPLES["en"])
-#     with tqdm(total=1, desc=f"Đang tạo giọng '{voice_preset_name}'") as pbar:
-#         audio_array = generate_audio_chunk(text_to_speak, voice_preset_name, model, processor, device)
-#         pbar.update(1)
-#     write(filepath, sampling_rate, audio_array)
-#     print(f"\nĐã tạo và lưu audio vào: {filepath}")
-#     return audio_array
-
 def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_rate, cache_dir):
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)

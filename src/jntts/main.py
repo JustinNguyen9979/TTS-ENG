@@ -17,6 +17,7 @@ from .file_tts import run_file_tts
 from .hardware_check import run_hardware_check
 from .ui import display_main_menu
 from .about import show_about
+from .voice_cloning import run_voice_cloning
 
 package_path = files('jntts')
 CACHE_DIR_APP = str(package_path / 'audio_cache')
@@ -27,27 +28,29 @@ DOWNLOADS_PATH = HOME_PATH / "Downloads" # Nối đường dẫn đến thư m�
 INPUT_DIR = DOWNLOADS_PATH / "jntts" / "Input"
 OUTPUT_DIR = DOWNLOADS_PATH / "jntts" / "Output"
 
-# APP_NAME = "jntts"
-# APP_AUTHOR = "JustinNguyen" 
-# USER_DATA_PATH = user_downloads_dir(APP_NAME, APP_AUTHOR)
-
-# INPUT_DIR = os.path.join(USER_DATA_PATH, "Input")
-# OUTPUT_DIR = os.path.join(USER_DATA_PATH, "Output")
-# CACHE_DIR_APP = os.path.join(USER_DATA_PATH, "audio_cache")
-
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def setup_directories():
-    print(f"Dữ liệu Input/Output sẽ được lưu tại: {os.path.join(DOWNLOADS_PATH, 'jntts')}")
     print("Đang kiểm tra và tạo các thư mục cần thiết...")
+    print(f"Dữ liệu Input/Output sẽ được lưu tại: {os.path.join(DOWNLOADS_PATH, 'jntts')}")
     
-    required_dirs = [INPUT_DIR, OUTPUT_DIR, CACHE_DIR_APP]
+    required_dirs = [INPUT_DIR, OUTPUT_DIR, CACHE_DIR_APP, "Voice"]
     for dir_name in required_dirs:
-        if not os.path.exists(dir_name):
-            os.makedirs(dir_name)
-            print(f" -> Đã tạo thư mục: {dir_name}")
-    # print("Gợi ý: Hãy đặt các file .txt của bạn vào thư mục 'Input' ở trên.")
+        # Xây dựng đường dẫn đầy đủ cho thư mục Voice
+        if dir_name == "Voice":
+            path_to_create = os.path.join(DOWNLOADS_PATH, "jntts", dir_name)
+        else:
+            path_to_create = dir_name
+
+        if not os.path.exists(path_to_create):
+            try:
+                os.makedirs(path_to_create)
+                print(f" -> Đã tạo thư mục: {path_to_create}")
+            except OSError as e:
+                print(f"LỖI: Không thể tạo thư mục {path_to_create}. Lỗi: {e}")
+                sys.exit(1)
+
 
 def main():
     setup_directories()
@@ -65,8 +68,10 @@ def main():
             elif choice == '2':
                 run_file_tts(model, processor, device, sampling_rate, INPUT_DIR, OUTPUT_DIR)
             elif choice == '3':
-                run_hardware_check()
+                run_voice_cloning(INPUT_DIR, OUTPUT_DIR, DOWNLOADS_PATH)
             elif choice == '4':
+                run_hardware_check()
+            elif choice == '5':
                 show_about()
             elif choice == '0':
                 print("Tạm biệt!")
