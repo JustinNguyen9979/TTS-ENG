@@ -1,5 +1,6 @@
 import random
 import sys
+import os
 try:
     from importlib.resources import files
 except ImportError:
@@ -66,14 +67,24 @@ class F5TTS:
             self.mel_spec_type, vocoder_local_path is not None, vocoder_local_path, self.device, hf_cache_dir
         )
 
-        # --- BƯỚC 4: TÌM ĐƯỜNG DẪN ĐẾN CHECKPOINT (trọng số đã huấn luyện) ---
-        repo_name, ckpt_step, ckpt_type = "SWivid/F5-TTS", 1250000, "safetensors"
+        local_vietnamese_ckpt_path = str(package_root.joinpath("checkpoints/model.safetensors"))
 
-        # Tự động tải checkpoint từ Hugging Face Hub nếu chưa được cung cấp
         if not ckpt_file:
-            ckpt_file = str(
-                cached_path(f"hf://{repo_name}/{model}/model_{ckpt_step}.{ckpt_type}", cache_dir=hf_cache_dir)
-            )
+            local_vietnamese_ckpt_path = str(package_root.joinpath("checkpoints/model.safetensors"))
+            
+            if os.path.exists(local_vietnamese_ckpt_path):
+                print(f"\n✅ Tìm thấy checkpoint đã Việt hóa! Sẽ sử dụng file cục bộ:")
+                print(f"   -> {local_vietnamese_ckpt_path}")
+                ckpt_file = local_vietnamese_ckpt_path
+            else:
+                print("\n⚠️ Không tìm thấy checkpoint cục bộ. Đang tải phiên bản mặc định từ Hugging Face...")
+                repo_name, ckpt_step, ckpt_type = "SWivid/F5-TTS", 1250000, "safetensors"
+                if model == "F5TTS_Base":
+                    if self.mel_spec_type == "vocos": ckpt_step = 1200000
+                
+                ckpt_file = str(
+                    cached_path(f"hf://{repo_name}/{model}/model_{ckpt_step}.{ckpt_type}", cache_dir=hf_cache_dir)
+                )
 
         # --- BƯỚC 5: TẢI MODEL CHÍNH VỚI VOCAB ĐÃ VIỆT HÓA ---
         # print(f"Sử dụng từ điển (vocab) tại: {vocab_path}")

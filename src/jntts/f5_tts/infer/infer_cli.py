@@ -10,24 +10,26 @@ import numpy as np
 import soundfile as sf
 import tomli
 from cached_path import cached_path
+from hydra.utils import get_class
 from omegaconf import OmegaConf
+from unidecode import unidecode
 
 from f5_tts.infer.utils_infer import (
-    mel_spec_type,
-    target_rms,
-    cross_fade_duration,
-    nfe_step,
     cfg_strength,
-    sway_sampling_coef,
-    speed,
+    cross_fade_duration,
+    device,
     fix_duration,
     infer_process,
     load_model,
     load_vocoder,
+    mel_spec_type,
+    nfe_step,
     preprocess_ref_audio_text,
     remove_silence_for_generated_wav,
+    speed,
+    sway_sampling_coef,
+    target_rms,
 )
-from f5_tts.model import DiT, UNetT  # noqa: F401. used for config
 
 
 parser = argparse.ArgumentParser(
@@ -112,6 +114,11 @@ parser.add_argument(
     help="To save each audio chunks during inference",
 )
 parser.add_argument(
+    "--no_legacy_text",
+    action="store_false",
+    help="Not to use lossy ASCII transliterations of unicode text in saved file names.",
+)
+parser.add_argument(
     "--remove_silence",
     action="store_true",
     help="To remove long silence found in ouput",
@@ -162,6 +169,11 @@ parser.add_argument(
     type=float,
     help=f"Fix the total duration (ref and gen audios) in seconds, default {fix_duration}",
 )
+parser.add_argument(
+    "--device",
+    type=str,
+    help="Specify the device to run on",
+)
 args = parser.parse_args()
 
 
@@ -191,6 +203,12 @@ output_file = args.output_file or config.get(
 )
 
 save_chunk = args.save_chunk or config.get("save_chunk", False)
+use_legacy_text = args.no_legacy_text or config.get("no_legacy_text", False)  # no_legacy_text is a store_false arg
+if save_chunk and use_legacy_text:
+    print(
+        "\nWarning to --save_chunk: lossy ASCII transliterations of unicode text for legacy (.wav) file names, --no_legacy_text to disable.\n"
+    )
+
 remove_silence = args.remove_silence or config.get("remove_silence", False)
 load_vocoder_from_local = args.load_vocoder_from_local or config.get("load_vocoder_from_local", False)
 
@@ -202,6 +220,7 @@ cfg_strength = args.cfg_strength or config.get("cfg_strength", cfg_strength)
 sway_sampling_coef = args.sway_sampling_coef or config.get("sway_sampling_coef", sway_sampling_coef)
 speed = args.speed or config.get("speed", speed)
 fix_duration = args.fix_duration or config.get("fix_duration", fix_duration)
+device = args.device or config.get("device", device)
 
 
 # patches for pip pkg user
@@ -239,20 +258,23 @@ if vocoder_name == "vocos":
 elif vocoder_name == "bigvgan":
     vocoder_local_path = "../checkpoints/bigvgan_v2_24khz_100band_256x"
 
-vocoder = load_vocoder(vocoder_name=vocoder_name, is_local=load_vocoder_from_local, local_path=vocoder_local_path)
+vocoder = load_vocoder(
+    vocoder_name=vocoder_name, is_local=load_vocoder_from_local, local_path=vocoder_local_path, device=device
+)
 
 
 # load TTS model
 
 model_cfg = OmegaConf.load(
     args.model_cfg or config.get("model_cfg", str(files("f5_tts").joinpath(f"configs/{model}.yaml")))
-).model
-model_cls = globals()[model_cfg.backbone]
+)
+model_cls = get_class(f"f5_tts.model.{model_cfg.model.backbone}")
+model_arc = model_cfg.model.arch
 
 repo_name, ckpt_step, ckpt_type = "F5-TTS", 1250000, "safetensors"
 
 if model != "F5TTS_Base":
-    assert vocoder_name == model_cfg.mel_spec.mel_spec_type
+    assert vocoder_name == model_cfg.model.mel_spec.mel_spec_type
 
 # override for previous models
 if model == "F5TTS_Base":
@@ -269,7 +291,9 @@ if not ckpt_file:
     ckpt_file = str(cached_path(f"hf://SWivid/{repo_name}/{model}/model_{ckpt_step}.{ckpt_type}"))
 
 print(f"Using {model}...")
-ema_model = load_model(model_cls, model_cfg.arch, ckpt_file, mel_spec_type=vocoder_name, vocab_file=vocab_file)
+ema_model = load_model(
+    model_cls, model_arc, ckpt_file, mel_spec_type=vocoder_name, vocab_file=vocab_file, device=device
+)
 
 
 # inference process
@@ -309,9 +333,10 @@ def main():
         text = re.sub(reg2, "", text)
         ref_audio_ = voices[voice]["ref_audio"]
         ref_text_ = voices[voice]["ref_text"]
+        local_speed = voices[voice].get("speed", speed)
         gen_text_ = text.strip()
         print(f"Voice: {voice}")
-        audio_segment, final_sample_rate, spectragram = infer_process(
+        audio_segment, final_sample_rate, spectrogram = infer_process(
             ref_audio_,
             ref_text_,
             gen_text_,
@@ -323,16 +348,19 @@ def main():
             nfe_step=nfe_step,
             cfg_strength=cfg_strength,
             sway_sampling_coef=sway_sampling_coef,
-            speed=speed,
+            speed=local_speed,
             fix_duration=fix_duration,
+            device=device,
         )
         generated_audio_segments.append(audio_segment)
 
         if save_chunk:
             if len(gen_text_) > 200:
                 gen_text_ = gen_text_[:200] + " ... "
+            if use_legacy_text:
+                gen_text_ = unidecode(gen_text_)
             sf.write(
-                os.path.join(output_chunk_dir, f"{len(generated_audio_segments)-1}_{gen_text_}.wav"),
+                os.path.join(output_chunk_dir, f"{len(generated_audio_segments) - 1}_{gen_text_}.wav"),
                 audio_segment,
                 final_sample_rate,
             )
