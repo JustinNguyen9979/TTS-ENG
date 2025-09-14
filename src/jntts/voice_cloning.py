@@ -11,7 +11,6 @@ from .file_tts import find_and_sort_input_files
 from .ui import clear_screen, generate_centered_ascii_title
 from contextlib import redirect_stdout, redirect_stderr
 
-
 try:
     import whisper
     from .f5_tts.api_f5 import F5TTS
@@ -69,7 +68,7 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
             _, probs = whisper_model.detect_language(mel)
             detected_lang = max(probs, key=probs.get)
             print(f" -> Ngôn ngữ audio: {detected_lang.upper()}")
-            # ... (Logic lấy ref_text giữ nguyên) ...
+
             if detected_lang == "vi":
                 expected_txt_file = os.path.splitext(ref_file)[0] + ".txt"
                 if os.path.exists(expected_txt_file):

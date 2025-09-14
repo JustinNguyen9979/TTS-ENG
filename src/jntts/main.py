@@ -18,6 +18,7 @@ from .hardware_check import run_hardware_check
 from .ui import display_main_menu
 from .about import show_about
 from .voice_cloning import run_voice_cloning
+from .transcribe_audio import run_transcription
 
 package_path = files('jntts')
 CACHE_DIR_APP = str(package_path / 'audio_cache')
@@ -61,7 +62,7 @@ def main():
         while True:
             display_main_menu()
             
-            choice = input("Nhập lựa chọn của bạn (0-4): ")
+            choice = input("Nhập lựa chọn của bạn (0-6): ")
 
             if choice == '1':
                 run_boxvoice(model, processor, device, sampling_rate, CACHE_DIR_APP)
@@ -70,8 +71,10 @@ def main():
             elif choice == '3':
                 run_voice_cloning(INPUT_DIR, OUTPUT_DIR, DOWNLOADS_PATH)
             elif choice == '4':
-                run_hardware_check()
+                run_transcription(INPUT_DIR, OUTPUT_DIR, DOWNLOADS_PATH)
             elif choice == '5':
+                run_hardware_check()
+            elif choice == '6':
                 show_about()
             elif choice == '0':
                 print("Tạm biệt!")
