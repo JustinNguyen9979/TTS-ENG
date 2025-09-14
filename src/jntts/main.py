@@ -1,6 +1,7 @@
 import sys
 import os
 import warnings
+import time
 
 from pathlib import Path
 try:
@@ -81,7 +82,8 @@ def main():
                 sys.exit(0)
             else:
                 print("Lựa chọn không hợp lệ. Vui lòng thử lại.")
-                input("Nhấn Enter để tiếp tục...")
+                time.sleep(1)
+                # input("Nhấn Enter để tiếp tục...")
 
     except KeyboardInterrupt:
         print("\n\nĐã thoát chương trình. Tạm biệt!")

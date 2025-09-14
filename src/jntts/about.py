@@ -1,4 +1,5 @@
 import os
+import textwrap
 from .ui import clear_screen, generate_centered_ascii_title
 
 BOX_CHARS = {
@@ -9,6 +10,30 @@ BOX_CHARS = {
     'horizontal': '─',
     'vertical': '│',
 }
+
+def format_and_wrap_line(label, value, label_width):
+    """
+    Định dạng một dòng (label, value), tự động xuống dòng cho value
+    với chiều rộng đã được fix cứng.
+    """
+    fixed_wrap_width = 30 
+    
+    wrapped_value_lines = textwrap.wrap(value, width=fixed_wrap_width)
+    
+    output_lines = []
+    
+    if wrapped_value_lines:
+        first_line = f"{label.ljust(label_width)} {wrapped_value_lines[0]}"
+        output_lines.append(first_line)
+    else:
+        first_line = f"{label.ljust(label_width)} "
+        output_lines.append(first_line)
+        
+    indent = " " * (label_width + 1)
+    for line in wrapped_value_lines[1:]:
+        output_lines.append(f"{indent}{line}")
+        
+    return output_lines
 
 def show_about():
     clear_screen()
@@ -23,7 +48,7 @@ def show_about():
     ]
     
     tech_stack_data = [
-        ("Core AI Model:", "suno/bark by Suno AI. F5-TTS"),
+        ("Core AI Model:", "suno/bark by Suno AI. F5-TTS. OpenAI-Whisper"),
         ("AI Framework:", "PyTorch"),
         ("AI Library:", "Hugging Face Transformers"),
     ]
@@ -35,8 +60,10 @@ def show_about():
     
     content_lines.append("AUTHOR & VERSION")
     content_lines.append("") 
+
     for label, value in tool_credits_data:
-        content_lines.append(f"{label.ljust(label_width)} {value}")
+        wrapped_lines = format_and_wrap_line(label, value, label_width)
+        content_lines.extend(wrapped_lines)
         
     content_lines.append("")
     content_lines.append(regal_border)
@@ -44,8 +71,10 @@ def show_about():
     
     content_lines.append("TECHNOLOGY")
     content_lines.append("")
+    
     for label, value in tech_stack_data:
-        content_lines.append(f"{label.ljust(label_width)} {value}")
+        wrapped_lines = format_and_wrap_line(label, value, label_width)
+        content_lines.extend(wrapped_lines)
         
     content_width = max(len(line) for line in content_lines)
     

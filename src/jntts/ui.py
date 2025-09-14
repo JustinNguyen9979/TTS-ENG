@@ -29,15 +29,20 @@ def display_main_menu():
     try:
         terminal_width = os.get_terminal_size().columns
     except OSError:
-        terminal_width = 80
+        terminal_width = 79
+    
+    menu_items = [
+        "Nghe thử giọng nói (Box Voice)",
+        "Tạo giọng nói (Text To Speech)",
+        "Nhân bản giọng nói (Clone Voice)",
+        "Chuyển giọng nói thành văn bản (Transcribe Audio)",
+        "Kiểm tra phần cứng (Check CPU/GPU)",
+        "Thông tin & Giới thiệu (About)"
+    ]
         
     print(f"{VERSION.center(terminal_width)}")
     print("\n" + "=" * terminal_width)
-    print("\n1. Nghe thử giọng nói (Box Voice)")
-    print("\n2. Tạo giọng nói (Text To Speech)")
-    print("\n3. Nhân bản giọng nói (Clone Voice)")
-    print("\n4. Chuyển giọng nói thành văn bản (Transcribe Audio)")
-    print("\n5. Kiểm tra phần cứng (Check CPU/GPU)")
-    print("\n6. Thông tin & Tác giả (About)")
-    print("\n0. Thoát chương trình (Exit)")
+    for i, item in enumerate(menu_items):
+        print(f"\n  [{i+1}]. {item}")
+    print("\n  [0]. Thoát chương trình (Exit)")
     print("\n" + "=" * terminal_width)
