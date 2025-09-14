@@ -87,6 +87,7 @@ Sau khi cài đặt thành công, bạn có thể khởi chạy công cụ bằn
 Công cụ này là kết quả của nhiều giờ nghiên cứu và phát triển tâm huyết, được bảo hộ bởi bản quyền. Tác giả hoan nghênh việc sử dụng công cụ cho các mục đích khác nhau, tuy nhiên xin vui lòng tuân thủ các điều khoản dưới đây:
   - Đối với mục đích sử dụng cá nhân, nghiên cứu hoặc học thuật: Nếu bạn thấy công cụ hữu ích, một khoản đóng góp để ủng hộ dự án sẽ là nguồn động viên to lớn, giúp tác giả có thêm nguồn lực để duy trì và phát triển các tính năng mới.
   - Đối với mục đích kinh doanh hoặc thương mại: Mọi hình thức tích hợp vào sản phẩm, cung cấp dịch vụ hoặc sử dụng nhằm tạo ra lợi nhuận đều yêu cầu phải có giấy phép sử dụng (license). Vui lòng liên hệ trực tiếp với tác giả để trao đổi và mua giấy phép phù hợp.
+
 Sự ủng hộ của bạn, dù qua hình thức đóng góp hay mua giấy phép, đều là sự công nhận quý giá cho công sức và tâm huyết đã đầu tư vào dự án.
 
 Xin chân thành cảm ơn!
