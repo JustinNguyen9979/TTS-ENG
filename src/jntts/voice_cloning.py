@@ -23,7 +23,7 @@ except ImportError as e:
 def find_voice_file(voice_dir):
     if not os.path.exists(voice_dir): os.makedirs(voice_dir)
     for filename in os.listdir(voice_dir):
-        if filename.lower().endswith(('.wav', '.mp3')):
+        if filename.lower().endswith(('.wav', '.mp3', '.m4a')):
             return os.path.join(voice_dir, filename)
     return None
 
