@@ -51,12 +51,34 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
         print(generate_centered_ascii_title("Voice Cloning"))
 
         voice_dir = os.path.join(downloads_path, "jntts", "Voice")
-        print(f"\nBước 1: Đang quét thư mục '{os.path.basename(voice_dir)}'...")
+        print(f"\nBước 1: Chọn cấu hình Voice Cloning...")
         ref_file = find_voice_file(voice_dir)
         if not ref_file:
             print(f"\nLỖI: Không tìm thấy file âm thanh mẫu trong thư mục 'Voice'.")
             input("Nhấn Enter...")
             return
+        
+        # --- Thiết lập giá trị mặc định ---
+        user_speed = 1.0
+        user_cfg_strength = 2.0
+
+        # --- Hỏi người dùng về Tốc độ (Speed) ---
+        speed_input = input(f" -> Nhập tốc độ nói (ví dụ: 0.9 là chậm hơn). Mặc định [{user_speed}] nhấn (Enter)): ").strip()
+        if speed_input:
+            try:
+                user_speed = float(speed_input)
+            except ValueError:
+                print(f"    ⚠️ Sử dụng tốc độ mặc định: {user_speed}")
+
+        # --- Hỏi người dùng về Độ ổn định (CFG Strength) ---
+        cfg_input = input(f" -> Nhập độ ổn định (ví dụ: 2.5 ổn định hơn). Mặc định [{user_cfg_strength}] nhấn (Enter)): ").strip()
+        if cfg_input:
+            try:
+                user_cfg_strength = float(cfg_input)
+            except ValueError:
+                print(f"    ⚠️ Sử dụng độ ổn định mặc định: {user_cfg_strength}")
+
+        print(f"\n   -> Tốc độ: {user_speed} | Độ ổn định: {user_cfg_strength}")
         
         print("\nBước 2: Đang nhận dạng giọng nói mẫu...")
         ref_text = ""
@@ -140,7 +162,13 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
                     try:
                         with open(os.devnull, 'w') as devnull:
                             with redirect_stdout(devnull), redirect_stderr(devnull):
-                                wav, _, _ = f5tts.infer(ref_file=ref_file, ref_text=ref_text, gen_text=sentence)
+                                wav, _, _ = f5tts.infer(
+                                    ref_file=ref_file, 
+                                    ref_text=ref_text, 
+                                    gen_text=sentence,
+                                    speed=user_speed,
+                                    cfg_strength=user_cfg_strength
+                                    )
                         pieces.append(wav)
                         pause_samples = np.zeros(int(f5tts.target_sample_rate * 0.5), dtype=np.float32)
                         pieces.append(pause_samples)
