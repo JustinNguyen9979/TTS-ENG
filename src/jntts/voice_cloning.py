@@ -10,6 +10,8 @@ from tqdm import tqdm # Giữ nguyên import
 from .file_tts import find_and_sort_input_files
 from .ui import clear_screen, generate_centered_ascii_title
 from contextlib import redirect_stdout, redirect_stderr
+from .config import prompt_for_audio_settings
+from scipy.signal import butter, filtfilt
 
 try:
     import whisper
@@ -38,10 +40,39 @@ def count_sentences_in_file(file_path):
     except Exception:
         return 0
 
+def apply_bass_boost(audio_data, sampling_rate, boost_db=0, cutoff_freq=400):
+    """
+    Áp dụng hiệu ứng tăng âm trầm dựa trên giá trị boost_db (0-10).
+    """
+    if boost_db <= 0:
+        return audio_data
+
+    # Chuyển đổi giá trị boost (1-30) thành một hệ số nhân hợp lý (ví dụ: 0.1-1.0)
+    boost_factor = boost_db / 10.0
+    
+    # Chuyển đổi audio sang float nếu nó là integer
+    if np.issubdtype(audio_data.dtype, np.integer):
+        max_val = np.iinfo(audio_data.dtype).max
+        audio_data = audio_data.astype(np.float32) / max_val
+
+    try:
+        nyquist = 0.5 * sampling_rate
+        normal_cutoff = cutoff_freq / nyquist
+        b, a = butter(4, normal_cutoff, btype='low', analog=False)
+        low_freqs = filtfilt(b, a, audio_data)
+        
+        boosted_audio = audio_data + low_freqs * boost_factor
+
+        max_abs_val = np.max(np.abs(boosted_audio))
+        if max_abs_val > 1.0:
+            boosted_audio /= max_abs_val
+
+        return boosted_audio
+    except Exception as e:
+        print(f"\n⚠️ Lỗi khi áp dụng hiệu ứng âm trầm: {e}. Giữ nguyên âm thanh gốc.")
+        return audio_data
+    
 def run_voice_cloning(input_dir, output_dir, downloads_path):
-    """
-    Chạy quy trình nhân bản giọng nói hàng loạt với logic hàng đợi động chuẩn.
-    """
     if not F5TTS_AVAILABLE:
         input("\n❌ LỖI: Chức năng không khả dụng. Nhấn Enter...")
         return
@@ -58,27 +89,18 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
             input("Nhấn Enter...")
             return
         
-        # --- Thiết lập giá trị mặc định ---
-        user_speed = 1.0
-        user_cfg_strength = 2.0
+        audio_settings = prompt_for_audio_settings(
+            ask_for_speed=True, 
+            ask_for_stability=True, 
+            ask_for_bass_boost=True
+        )
 
-        # --- Hỏi người dùng về Tốc độ (Speed) ---
-        speed_input = input(f" -> Nhập tốc độ nói (ví dụ: 0.9 là chậm hơn). Mặc định [{user_speed}] nhấn (Enter)): ").strip()
-        if speed_input:
-            try:
-                user_speed = float(speed_input)
-            except ValueError:
-                print(f"    ⚠️ Sử dụng tốc độ mặc định: {user_speed}")
+        # Gán các giá trị vào biến để sử dụng trong code phía dưới
+        user_speed = audio_settings['speed']
+        user_cfg_strength = audio_settings['stability']
+        bass_boost_db = audio_settings['bass_boost']
 
-        # --- Hỏi người dùng về Độ ổn định (CFG Strength) ---
-        cfg_input = input(f" -> Nhập độ ổn định (ví dụ: 2.5 ổn định hơn). Mặc định [{user_cfg_strength}] nhấn (Enter)): ").strip()
-        if cfg_input:
-            try:
-                user_cfg_strength = float(cfg_input)
-            except ValueError:
-                print(f"    ⚠️ Sử dụng độ ổn định mặc định: {user_cfg_strength}")
-
-        print(f"\n   -> Tốc độ: {user_speed} | Độ ổn định: {user_cfg_strength}")
+        print(f"\n   -> Tốc độ: {user_speed} | Độ ổn định: {user_cfg_strength} | Âm trầm: {bass_boost_db}")
         
         print("\nBước 2: Đang nhận dạng giọng nói mẫu...")
         ref_text = ""
@@ -183,14 +205,26 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
                     continue
 
                 final_audio_data = np.concatenate(pieces)
+
+                # Áp dụng hiệu ứng âm trầm 
+                if bass_boost_db > 0:
+                    # tqdm.write(f"-> Đang áp dụng hiệu ứng âm trầm [Mức: {bass_boost_db}]...")
+                    # Lấy sample rate từ đối tượng f5tts
+                    sampling_rate = f5tts.target_sample_rate
+                    final_audio_data = apply_bass_boost(final_audio_data, sampling_rate, boost_db=bass_boost_db)
                 
                 base_name = os.path.splitext(os.path.basename(file_path))[0]
                 voice_name_part = os.path.splitext(os.path.basename(ref_file))[0]
                 safe_voice_name = re.sub(r'[^\w-]', '', voice_name_part)
-                output_filename = f"{base_name}_CLONE_{safe_voice_name}.wav"
+                
+                # Thêm hậu tố vào tên file nếu có tăng âm trầm
+                bass_suffix = f"_B{bass_boost_db}" if bass_boost_db > 0 else ""
+                output_filename = f"{base_name}_CLONE_{safe_voice_name}{bass_suffix}.wav"
+                
                 output_filepath = os.path.join(output_dir, output_filename)
                 
                 f5tts.export_wav(final_audio_data, output_filepath)
+
                 processed_files_log.append(output_filename)
                 processed_files_set.add(file_path)
 

@@ -2,7 +2,8 @@ import os
 import sys
 from scipy.io.wavfile import write, read
 import sounddevice as sd
-from .config import VOICE_PRESETS, TEXT_SAMPLES, LANGUAGE_NATIVE_NAMES
+import select
+from .config import VOICE_PRESETS, TEXT_SAMPLES, LANGUAGE_NATIVE_NAMES, PROGRESS_BAR_WIDTH, PROGRESS_BAR_CHAR, REMAINING_BAR_CHAR
 from .tts_utils import generate_audio_chunk
 from tqdm import tqdm
 import time
@@ -67,6 +68,78 @@ def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_r
     write(filepath, sampling_rate, audio_array)
     print(f"\nĐã tạo và lưu audio vào: {filepath}")
     return audio_array
+
+def play_audio_with_progress(audio_data, sampling_rate, voice_name):
+    """
+    Phát một đoạn audio, hiển thị nhãn văn bản, thanh tiến trình và thời gian.
+    Giao diện sẽ tự động co giãn theo kích thước terminal.
+    Cho phép người dùng nhấn Enter để dừng phát.
+    """
+    try:
+        duration = len(audio_data) / sampling_rate
+        sd.play(audio_data, sampling_rate)
+        
+        start_time = time.time()
+        
+        # In thông báo ban đầu
+        print(f"\n▶️  Đang chuẩn bị phát: {voice_name}")
+        print("\n(Nhấn Enter để dừng bất kỳ lúc nào)")
+        print()
+
+        # Trích xuất tên giọng đọc ngắn gọn để hiển thị trên thanh tiến trình
+        voice_display_short = voice_name.split('-', 1)[-1].strip()
+        text_label = f"Playing: {voice_display_short}"
+
+        while True:
+            elapsed_time = time.time() - start_time
+            if elapsed_time > duration:
+                break # Âm thanh đã phát xong
+
+            # Kiểm tra xem người dùng có nhấn phím nào không
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                sys.stdin.readline()
+                print("\n\n⏹️  Đã dừng phát.")
+                sd.stop()
+                return
+
+            # --- TÍNH TOÁN ĐỘ RỘNG THANH TIẾN TRÌNH MỘT CÁCH LINH HOẠT ---
+            try:
+                terminal_width = os.get_terminal_size().columns
+            except OSError:
+                terminal_width = 80
+            
+            # Tính toán không gian cho các phần tử khác (lề, nhãn, thời gian)
+            padding = 5 # Giữ lề 5 ký tự ở đầu
+            time_info_str = f"{elapsed_time:.1f}s / {duration:.1f}s"
+            
+            # Tổng không gian đã chiếm bởi các yếu tố không phải thanh tiến trình
+            # Gồm: lề trái + nhãn text + khoảng cách + cặp ngoặc [] + khoảng cách + chuỗi thời gian
+            other_elements_width = padding + len(text_label) + len(" [] ") + len(time_info_str)
+            
+            # Độ rộng cuối cùng của thanh tiến trình
+            progress_bar_width = max(10, terminal_width - other_elements_width - padding) # Trừ đi lề phải 10
+
+            # --- VẼ THANH TIẾN TRÌNH ---
+            progress_percent = elapsed_time / duration
+            filled_len = int(progress_bar_width * progress_percent)
+            bar = PROGRESS_BAR_CHAR * filled_len + REMAINING_BAR_CHAR * (progress_bar_width - filled_len)
+            
+            # Tạo chuỗi hiển thị hoàn chỉnh
+            display_line = f"{' ' * padding}{text_label} [{bar}] {time_info_str}"
+            
+            # In ra màn hình, .ljust để đảm bảo ghi đè toàn bộ dòng cũ
+            print(f"\r{display_line.ljust(terminal_width - 1)}", end="")
+
+            time.sleep(1)
+
+        # Xóa dòng tiến trình sau khi hoàn tất
+        print("\r" + " " * (terminal_width - 1) + "\r", end="")
+        print("\n✅ Hoàn tất.")
+        sd.stop()
+
+    except Exception as e:
+        print(f"\nLỗi khi phát âm thanh: {e}")
+        sd.stop()
 
 def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
     """Chạy vòng lặp menu cho chức năng Jukebox với menu phân cấp."""
@@ -133,10 +206,9 @@ def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
                         if selected_display_name:
                             selected_voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
                             audio_to_play = get_audio_from_cache(selected_voice_preset, model, processor, device, sampling_rate, cache_dir=cache_dir_path)
-                            print(f"\nĐang phát giọng: {selected_display_name}")
-                            sd.play(audio_to_play, sampling_rate)
-                            sd.wait()
-                            # input("\nNhấn Enter để tiếp tục...")
+                            
+                            # Gọi hàm phát audio mới thay cho logic cũ
+                            play_audio_with_progress(audio_to_play, sampling_rate, selected_display_name)
                         else:
                             print("\nLựa chọn không hợp lệ!")
                             time.sleep(1)

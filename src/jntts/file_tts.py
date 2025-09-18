@@ -2,11 +2,12 @@ import os
 import sys
 import re
 import numpy as np
+import time
 from scipy.io.wavfile import write
-from .config import VOICE_PRESETS, LANGUAGE_NATIVE_NAMES
+from .config import VOICE_PRESETS, LANGUAGE_NATIVE_NAMES, prompt_for_audio_settings
 from .tts_utils import generate_audio_chunk
 from tqdm import tqdm
-import time
+from scipy.signal import butter, filtfilt
 from .ui import clear_screen, generate_centered_ascii_title
 from .box_voice import display_voice_menu_grid
 
@@ -25,6 +26,38 @@ def find_and_sort_input_files(input_dir):
 
     txt_files.sort(key=get_sort_key)
     return [os.path.join(input_dir, f) for f in txt_files]
+
+def apply_bass_boost(audio_data, sampling_rate, boost_db=0, cutoff_freq=400):
+    """
+    Áp dụng hiệu ứng tăng âm trầm dựa trên giá trị boost_db (0-10).
+    """
+    if boost_db <= 0:
+        return audio_data
+
+    # Chuyển đổi giá trị boost (1-10) thành một hệ số nhân hợp lý (ví dụ: 0.1-1.0)
+    boost_factor = boost_db / 10.0
+    
+    # Chuyển đổi audio sang float nếu nó là integer
+    if np.issubdtype(audio_data.dtype, np.integer):
+        max_val = np.iinfo(audio_data.dtype).max
+        audio_data = audio_data.astype(np.float32) / max_val
+
+    try:
+        nyquist = 0.5 * sampling_rate
+        normal_cutoff = cutoff_freq / nyquist
+        b, a = butter(4, normal_cutoff, btype='low', analog=False)
+        low_freqs = filtfilt(b, a, audio_data)
+        
+        boosted_audio = audio_data + low_freqs * boost_factor
+
+        max_abs_val = np.max(np.abs(boosted_audio))
+        if max_abs_val > 1.0:
+            boosted_audio /= max_abs_val
+
+        return boosted_audio
+    except Exception as e:
+        print(f"\n⚠️ Lỗi khi áp dụng hiệu ứng âm trầm: {e}. Giữ nguyên âm thanh gốc.")
+        return audio_data
 
 def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir):
     try:
@@ -91,12 +124,29 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                     break 
 
                 try:
+                    clear_screen() 
+                    print(generate_centered_ascii_title("Text To Speech"))
                     choice_num = int(choice)
                     selected_display_name = next((key for key in voices_in_lang if key.startswith(f"{choice_num}. ")), None)
                     if selected_display_name:
                         voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
                         lang_code = VOICE_PRESETS[selected_display_name]["lang"]
                         voice_name_part = "".join(re.findall(r'\b\w', selected_display_name.split('-')[1]))
+                        voice_display_short = selected_display_name.split('-', 1)[-1].strip()
+
+                        # Gọi hàm cấu hình đa năng, yêu cầu tất cả các thông số
+                        audio_settings = prompt_for_audio_settings(
+                            ask_for_speed=True, 
+                            ask_for_stability=True, 
+                            ask_for_bass_boost=True
+                        )
+
+                        # Gán các giá trị vào biến để sử dụng
+                        user_speed = audio_settings['speed']
+                        user_cfg_strength = audio_settings['stability']
+                        bass_boost_db = audio_settings['bass_boost']
+
+                        print(f"\n   -> Tốc độ: {user_speed} | Độ ổn định: {user_cfg_strength} | Âm trầm: {bass_boost_db} | Giọng: {voice_display_short}")
                         
                         # --- BẮT ĐẦU XỬ LÝ FILE (SAU KHI ĐÃ CHỌN GIỌNG) ---
                         files_to_process = initial_files.copy()
@@ -126,7 +176,15 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                             pieces = []
                             for sentence in tqdm(sentences, desc=f"Tiến trình"):
                                 if not sentence.strip(): continue
-                                audio_chunk = generate_audio_chunk(sentence, voice_preset, model, processor, device)
+                                audio_chunk = generate_audio_chunk(
+                                    sentence, 
+                                    voice_preset, 
+                                    model, 
+                                    processor, 
+                                    device,
+                                    speed=user_speed,
+                                    cfg_strength=user_cfg_strength
+                                    )
                                 pieces.append(audio_chunk)
                                 pause_samples = np.zeros(int(sampling_rate * 0.5), dtype=np.float32)
                                 pieces.append(pause_samples)
@@ -135,12 +193,29 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                                 continue
                             final_audio_data = np.concatenate(pieces)
 
+                            # 1. Áp dụng hiệu ứng âm trầm (nếu có) TRÊN dữ liệu float32
+                            if bass_boost_db > 0:
+                                final_audio_data = apply_bass_boost(final_audio_data, sampling_rate, boost_db=bass_boost_db)
+                            
+                            # 2. SAU KHI đã xử lý xong, LUÔN LUÔN chuyển đổi về int16 để ghi file
+                            # Đảm bảo audio nằm trong khoảng [-1, 1] trước khi nhân
+                            final_audio_data = np.clip(final_audio_data, -1.0, 1.0)
+                            final_audio_data = (final_audio_data * 32767).astype(np.int16)
+
                             if not os.path.exists(output_dir): os.makedirs(output_dir)
                             base_name = os.path.splitext(os.path.basename(file_path))[0]
-                            output_filename = f"{base_name}_{lang_code.upper()}_{voice_name_part}.wav"
+                            
+                            # Tạo hậu tố (suffix) cho tên file dựa trên các cài đặt
+                            speed_suffix = f"_S{user_speed}"
+                            cfg_suffix = f"_C{user_cfg_strength}"
+                            bass_suffix = f"_B{bass_boost_db}" if bass_boost_db > 0 else ""
+                            
+                            output_filename = f"{base_name}_{lang_code.upper()}_{voice_name_part}{speed_suffix}{cfg_suffix}{bass_suffix}.wav"
+                            
                             output_filepath = os.path.join(output_dir, output_filename)
 
                             write(output_filepath, sampling_rate, final_audio_data)
+
 
                             processed_files_log.append(output_filename)
                             processed_files_set.add(file_path)

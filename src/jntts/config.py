@@ -1,5 +1,8 @@
 MIN_RAM_GB = 8
 MIN_VRAM_GB = 6
+PROGRESS_BAR_WIDTH = 40  # Độ rộng của thanh tiến trình (số ký tự)
+PROGRESS_BAR_CHAR = '█'  # Ký tự cho phần đã hoàn thành
+REMAINING_BAR_CHAR = '░' # Ký tự cho phần còn lại
 
 TEXT_SAMPLES = {
     "en": "A very warm welcome to you! It is a genuine pleasure to have you with us today. I sincerely hope you've been having a wonderful day so far and that the rest of your time here is enjoyable and productive.",
@@ -176,3 +179,69 @@ LANGUAGE_NATIVE_NAMES = {
     "tr": "🇹🇷 Thổ Nhĩ Kỳ 🇹🇷",
     "hi": "🇮🇳 Ấn Độ 🇮🇳",
 }
+
+
+def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_for_bass_boost=True):
+    """
+    Hiển thị lời nhắc để người dùng cấu hình các thông số âm thanh.
+    Hàm này có thể hỏi về Tốc độ, Độ ổn định, và Âm trầm một cách linh hoạt.
+    
+    Returns:
+        dict: Một dictionary chứa các giá trị đã được cấu hình.
+    """
+    settings = {
+        'speed': 1.0,
+        'stability': 2.0,
+        'bass_boost': 0
+    }
+    
+    # print("\n" + "-"*50)
+    # print("TÙY CHỈNH ÂM THANH".center(50))
+    # print("-" * 50)
+
+    # --- Hỏi về Tốc độ (nếu được yêu cầu) ---
+    if ask_for_speed:
+        while True:
+            prompt = f"\n -> Nhập tốc độ nói (ví dụ: 0.9, 1.2). Mặc định [{settings['speed']}] nhấn (Enter)): "
+            speed_input = input(prompt).strip()
+            if not speed_input:
+                break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
+            try:
+                settings['speed'] = float(speed_input)
+                break # Nhập đúng -> gán giá trị và thoát vòng lặp
+            except ValueError:
+                print(f"    ❌ Lỗi: Vui lòng chỉ nhập số. Hãy thử lại.")
+
+    # --- Hỏi về Độ ổn định (với vòng lặp validation) ---
+    if ask_for_stability:
+        while True:
+            prompt = f"\n -> Nhập độ ổn định (ví dụ: 2.0, 2.5). Mặc định [{settings['stability']}] nhấn (Enter)): "
+            cfg_input = input(prompt).strip()
+            if not cfg_input:
+                break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
+            try:
+                settings['stability'] = float(cfg_input)
+                break # Nhập đúng -> gán giá trị và thoát vòng lặp
+            except ValueError:
+                print(f"    ❌ Lỗi: Vui lòng chỉ nhập số. Hãy thử lại.")
+    
+    # --- Hỏi về Âm trầm (với vòng lặp validation) ---
+    if ask_for_bass_boost:
+        # Giới hạn trong khoảng 0-20
+        BASS_BOOST_MIN, BASS_BOOST_MAX = 0, 20
+        while True:
+            prompt = f"\n -> Nhập mức tăng âm trầm ({BASS_BOOST_MIN}-{BASS_BOOST_MAX}). Mặc định [{settings['bass_boost']}] nhấn (Enter)): "
+            bass_input = input(prompt).strip()
+            if not bass_input:
+                break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
+            try:
+                value = int(bass_input)
+                if BASS_BOOST_MIN <= value <= BASS_BOOST_MAX:
+                    settings['bass_boost'] = value
+                    break # Nhập đúng và trong khoảng -> gán giá trị và thoát vòng lặp
+                else:
+                    print(f"    ❌ Lỗi: Giá trị phải nằm trong khoảng từ {BASS_BOOST_MIN} đến {BASS_BOOST_MAX}. Hãy thử lại.")
+            except ValueError:
+                print(f"    ❌ Lỗi: Vui lòng chỉ nhập số nguyên. Hãy thử lại.")
+
+    return settings
