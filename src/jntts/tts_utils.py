@@ -30,15 +30,21 @@ def generate_audio_chunk(text, voice_preset, model, processor, device, speed=1.0
         return_tensors="pt"
     ).to(device)
 
+    generation_args = {
+        "do_sample": True,
+    }
+
+    if speed is not None and speed > 0:
+        generation_args["length_penalty"] = 1.0 / speed
+
+    if cfg_strength is not None:
+        generation_args["guidance_scale"] = cfg_strength
+
     # Thêm tham số điều khiển tốc độ vào lệnh generate
     # Tham số `length_penalty` là cách phổ biến để kiểm soát tốc độ trong các model của Hugging Face
     # speed > 1.0 -> nhanh hơn -> length_penalty < 1.0
     # speed < 1.0 -> chậm hơn -> length_penalty > 1.0
     with torch.inference_mode():
-        speech_output = model.generate(
-            **inputs, 
-            do_sample=True,
-            length_penalty=1.0 / speed if speed > 0 else 1.0 # <-- DÒNG MỚI ĐƯỢC THÊM
-        )
+        speech_output = model.generate(**inputs, **generation_args)
     
     return speech_output.squeeze().cpu().numpy()

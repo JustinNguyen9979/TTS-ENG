@@ -3,7 +3,7 @@ import sys
 import re
 import numpy as np
 import time
-from scipy.io.wavfile import write
+from scipy.io.wavfile import write, read
 from .config import VOICE_PRESETS, LANGUAGE_NATIVE_NAMES, prompt_for_audio_settings
 from .tts_utils import generate_audio_chunk
 from tqdm import tqdm
@@ -136,8 +136,8 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
 
                         # Gọi hàm cấu hình đa năng, yêu cầu tất cả các thông số
                         audio_settings = prompt_for_audio_settings(
-                            ask_for_speed=True, 
-                            ask_for_stability=True, 
+                            ask_for_speed=False, 
+                            ask_for_stability=False, 
                             ask_for_bass_boost=True
                         )
 
@@ -146,11 +146,17 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                         user_cfg_strength = audio_settings['stability']
                         bass_boost_db = audio_settings['bass_boost']
 
-                        print(f"\n   -> Tốc độ: {user_speed} | Độ ổn định: {user_cfg_strength} | Âm trầm: {bass_boost_db} | Giọng: {voice_display_short}")
+                        speed_info = f"Tốc độ={user_speed}" if user_speed is not None else "Tốc độ = Mặc định"
+                        stability_info = f"Độ ổn định = {user_cfg_strength}" if user_cfg_strength is not None else "Độ ổn định = Mặc định"
+                        bass_info = f"Âm trầm = {bass_boost_db}" if bass_boost_db > 0 else "Âm trầm = Không"
+                        voice_info = f"Giọng = '{voice_display_short}'"
+
+                        print(f"\n   -> Cấu hình: {speed_info}, {stability_info}, {bass_info}, {voice_info}")
                         
                         # --- BẮT ĐẦU XỬ LÝ FILE (SAU KHI ĐÃ CHỌN GIỌNG) ---
                         files_to_process = initial_files.copy()
                         processed_files_log = []
+                        generated_files_info = []
                         processed_files_set = set()
                         while files_to_process:
                             file_path = files_to_process.pop(0)
@@ -193,33 +199,34 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                                 continue
                             final_audio_data = np.concatenate(pieces)
 
-                            # 1. Áp dụng hiệu ứng âm trầm (nếu có) TRÊN dữ liệu float32
-                            if bass_boost_db > 0:
-                                final_audio_data = apply_bass_boost(final_audio_data, sampling_rate, boost_db=bass_boost_db)
-                            
-                            # 2. SAU KHI đã xử lý xong, LUÔN LUÔN chuyển đổi về int16 để ghi file
-                            # Đảm bảo audio nằm trong khoảng [-1, 1] trước khi nhân
+                            # Chỉ chuyển đổi và chuẩn bị ghi file GỐC
                             final_audio_data = np.clip(final_audio_data, -1.0, 1.0)
                             final_audio_data = (final_audio_data * 32767).astype(np.int16)
 
                             if not os.path.exists(output_dir): os.makedirs(output_dir)
                             base_name = os.path.splitext(os.path.basename(file_path))[0]
                             
-                            # Tạo hậu tố (suffix) cho tên file dựa trên các cài đặt
-                            speed_suffix = f"_S{user_speed}"
-                            cfg_suffix = f"_C{user_cfg_strength}"
-                            bass_suffix = f"_B{bass_boost_db}" if bass_boost_db > 0 else ""
+                            # Tạo tên file GỐC (chưa có hậu tố âm trầm)
+                            speed_suffix = f"_S{user_speed}" if user_speed is not None else ""
+                            cfg_suffix = f"_C{user_cfg_strength}" if user_cfg_strength is not None else ""
                             
-                            output_filename = f"{base_name}_{lang_code.upper()}_{voice_name_part}{speed_suffix}{cfg_suffix}{bass_suffix}.wav"
-                            
+                            output_filename = f"{base_name}_{lang_code.upper()}_{voice_name_part}{speed_suffix}{cfg_suffix}.wav"
                             output_filepath = os.path.join(output_dir, output_filename)
 
+                            # Ghi file audio GỐC ra đĩa
                             write(output_filepath, sampling_rate, final_audio_data)
 
-
+                            # Lưu lại thông tin cần thiết cho bước hậu kỳ
+                            generated_files_info.append({
+                                'path': output_filepath,
+                                'original_name': output_filename
+                            })
                             processed_files_log.append(output_filename)
                             processed_files_set.add(file_path)
-                            print(f"\n✅ Hoàn tất. Đã lưu tại: {output_filepath}")
+                            # print(f"\n✅ Đã tạo file gốc: {output_filename}")
+
+                            # Phần quét file mới bắt đầu ngay sau đây...
+                            current_all_files = find_and_sort_input_files(input_dir)
 
                             current_all_files = find_and_sort_input_files(input_dir)
                             
@@ -228,23 +235,63 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                                     print(f"-> Phát hiện file mới: {os.path.basename(new_file)}. Đợi xử lý.")
                                     files_to_process.append(new_file)
                         
-                        # --- KẾT THÚC XỬ LÝ VÀ BÁO CÁO ---
+                        # --- GIAI ĐOẠN HẬU KỲ VÀ BÁO CÁO CUỐI CÙNG ---
+                        final_log = processed_files_log
+
+                        # --- BƯỚC HẬU KỲ ÂM TRẦM (NẾU CẦN) ---
+                        if bass_boost_db > 0:
+                            # print("\nÁp dụng hiệu ứng âm trầm một cách thầm lặng...") # Dòng này có thể bật để debug
+                            boosted_file_map = {} # Dùng để ánh xạ tên file cũ sang tên file mới
+                            
+                            # Thay thế tqdm bằng vòng lặp thường để không hiển thị progress bar
+                            for file_info in generated_files_info:
+                                file_path = file_info['path']
+                                try:
+                                    rate, audio_data = read(file_path)
+                                    boosted_audio = apply_bass_boost(audio_data, rate, boost_db=bass_boost_db)
+                                    boosted_audio = np.clip(boosted_audio, -1.0, 1.0)
+                                    boosted_audio = (boosted_audio * 32767).astype(np.int16)
+                                    
+                                    # Tạo tên file mới
+                                    base, ext = os.path.splitext(file_path)
+                                    new_filepath = f"{base}_B{bass_boost_db}{ext}"
+                                    
+                                    # Ghi file mới đã được làm ấm
+                                    write(new_filepath, rate, boosted_audio)
+                                    
+                                    # XÓA FILE GỐC
+                                    os.remove(file_path)
+                                    
+                                    # Lưu lại sự thay đổi tên file
+                                    original_filename = file_info['original_name']
+                                    new_filename = os.path.basename(new_filepath)
+                                    boosted_file_map[original_filename] = new_filename
+                                    
+                                except Exception as e:
+                                    # In lỗi ra nếu có sự cố, nhưng không hiển thị progress bar
+                                    print(f"\n⚠️ Lỗi khi xử lý hậu kỳ file '{os.path.basename(file_path)}': {e}")
+                            
+                            # Cập nhật lại danh sách log cuối cùng với các tên file mới
+                            final_log = [boosted_file_map.get(log, log) for log in processed_files_log]
+
+                        # --- BÁO CÁO TỔNG KẾT ---
                         try:
                             terminal_width = os.get_terminal_size().columns
                         except OSError: terminal_width = 80
                         dash_line = "-" * terminal_width
                         print(f"\n{dash_line}")
-                        
-                        if processed_files_log:
-                            print("\n✅ XUẤT FILE AUDIO THÀNH CÔNG!".center(terminal_width))
-                            print("\nCác file audio đã được tạo thành công:".center(terminal_width))
-                            for log_entry in processed_files_log:
-                                print(f"  - {log_entry}")
-                        else:
+
+                        if not final_log:
                             print("Không có file nào được xử lý thành công.".center(terminal_width))
+                        else:
+                            print("\n✅ XỬ LÝ HOÀN TẤT!".center(terminal_width))
+                            print("\nCác file sau đã được tạo thành công:".center(terminal_width))
+                            for log_entry in final_log:
+                                print(f"  - {log_entry}")
+                        
                         print(dash_line)
                         input("\nNhấn Enter để quay lại menu chính...")
-                        return 
+                        return
                     else:
                         print("Lựa chọn không hợp lệ!")
                 except (ValueError, IndexError):

@@ -190,6 +190,13 @@ def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_
         dict: Một dictionary chứa các giá trị đã được cấu hình.
     """
     settings = {
+        'speed': None,
+        'stability': None,
+        'bass_boost': 0
+    }
+
+    # Giá trị mặc định hiển thị cho người dùng
+    defaults = {
         'speed': 1.0,
         'stability': 2.0,
         'bass_boost': 0
@@ -202,9 +209,10 @@ def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_
     # --- Hỏi về Tốc độ (nếu được yêu cầu) ---
     if ask_for_speed:
         while True:
-            prompt = f"\n -> Nhập tốc độ nói (ví dụ: 0.9, 1.2). Mặc định [{settings['speed']}] nhấn (Enter)): "
+            prompt = f"\n -> Nhập tốc độ nói (ví dụ: 0.9, 1.2). Mặc định [{defaults['speed']}] nhấn (Enter)): "
             speed_input = input(prompt).strip()
             if not speed_input:
+                settings['speed'] = None
                 break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
             try:
                 settings['speed'] = float(speed_input)
@@ -215,9 +223,10 @@ def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_
     # --- Hỏi về Độ ổn định (với vòng lặp validation) ---
     if ask_for_stability:
         while True:
-            prompt = f"\n -> Nhập độ ổn định (ví dụ: 2.0, 2.5). Mặc định [{settings['stability']}] nhấn (Enter)): "
+            prompt = f"\n -> Nhập độ ổn định (ví dụ: 2.0, 2.5). Mặc định [{defaults['stability']}] nhấn (Enter)): "
             cfg_input = input(prompt).strip()
             if not cfg_input:
+                settings['stability'] = None
                 break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
             try:
                 settings['stability'] = float(cfg_input)
@@ -230,9 +239,10 @@ def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_
         # Giới hạn trong khoảng 0-20
         BASS_BOOST_MIN, BASS_BOOST_MAX = 0, 20
         while True:
-            prompt = f"\n -> Nhập mức tăng âm trầm ({BASS_BOOST_MIN}-{BASS_BOOST_MAX}). Mặc định [{settings['bass_boost']}] nhấn (Enter)): "
+            prompt = f"\n -> Nhập mức tăng âm trầm ({BASS_BOOST_MIN}-{BASS_BOOST_MAX}). Mặc định [{defaults['bass_boost']}] nhấn (Enter)): "
             bass_input = input(prompt).strip()
             if not bass_input:
+                settings['bass_boost'] = 0
                 break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
             try:
                 value = int(bass_input)
