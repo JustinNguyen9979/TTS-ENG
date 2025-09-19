@@ -18,7 +18,11 @@ try:
     from .f5_tts.api_f5 import F5TTS
     F5TTS_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️ CẢNH BÁO: Không thể import các thư viện cần thiết cho Voice Cloning...")
+    print("\n" + "="*80)
+    print("DEBUG: LỖI IMPORT:")
+    print(e)
+    print("="*80 + "\n")
+    print(f"\n⚠️ CẢNH BÁO: Không thể import các thư viện cần thiết cho Voice Cloning...")
     F5TTS = None
     F5TTS_AVAILABLE = False
 
@@ -100,7 +104,16 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
         user_cfg_strength = audio_settings['stability']
         bass_boost_db = audio_settings['bass_boost']
 
-        print(f"\n   -> Tốc độ: {user_speed} | Độ ổn định: {user_cfg_strength} | Âm trầm: {bass_boost_db}")
+        # Xác định giá trị để hiển thị (giá trị người dùng nhập hoặc giá trị mặc định)
+        display_speed = user_speed if user_speed is not None else 1.0
+        display_cfg = user_cfg_strength if user_cfg_strength is not None else 2.0
+
+        # Xây dựng chuỗi thông báo
+        speed_info = f"Tốc độ = {display_speed}" + (" (Mặc định)" if user_speed is None else "")
+        stability_info = f"Độ ổn định = {display_cfg}" + (" (Mặc định)" if user_cfg_strength is None else "")
+        bass_info = f"Âm trầm = {bass_boost_db}" if bass_boost_db > 0 else "Âm trầm = Không"
+        
+        print(f"\n   -> Cấu hình: {speed_info} | {stability_info} | {bass_info}")
         
         print("\nBước 2: Đang nhận dạng giọng nói mẫu...")
         ref_text = ""
@@ -184,12 +197,14 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
                     try:
                         with open(os.devnull, 'w') as devnull:
                             with redirect_stdout(devnull), redirect_stderr(devnull):
+                                speed_to_use = user_speed if user_speed is not None else 1.0
+                                cfg_to_use = user_cfg_strength if user_cfg_strength is not None else 2.0
                                 wav, _, _ = f5tts.infer(
                                     ref_file=ref_file, 
                                     ref_text=ref_text, 
                                     gen_text=sentence,
-                                    speed=user_speed,
-                                    cfg_strength=user_cfg_strength
+                                    speed=speed_to_use,
+                                    cfg_strength=cfg_to_use
                                     )
                         pieces.append(wav)
                         pause_samples = np.zeros(int(f5tts.target_sample_rate * 0.5), dtype=np.float32)
@@ -217,9 +232,19 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
                 voice_name_part = os.path.splitext(os.path.basename(ref_file))[0]
                 safe_voice_name = re.sub(r'[^\w-]', '', voice_name_part)
                 
-                # Thêm hậu tố vào tên file nếu có tăng âm trầm
+                # --- TẠO HẬU TỐ (SUFFIX) CHO TÊN FILE MỘT CÁCH LINH HOẠT ---
+                
+                # Chỉ thêm hậu tố tốc độ nếu người dùng đã nhập giá trị
+                speed_suffix = f"_S{user_speed}" if user_speed is not None else ""
+                
+                # Chỉ thêm hậu tố độ ổn định nếu người dùng đã nhập giá trị
+                cfg_suffix = f"_C{user_cfg_strength}" if user_cfg_strength is not None else ""
+                
+                # Chỉ thêm hậu tố âm trầm nếu giá trị > 0
                 bass_suffix = f"_B{bass_boost_db}" if bass_boost_db > 0 else ""
-                output_filename = f"{base_name}_CLONE_{safe_voice_name}{bass_suffix}.wav"
+                
+                # Ghép tất cả các phần lại để tạo tên file cuối cùng
+                output_filename = f"{base_name}_CLONE_{safe_voice_name}{speed_suffix}{cfg_suffix}{bass_suffix}.wav"
                 
                 output_filepath = os.path.join(output_dir, output_filename)
                 

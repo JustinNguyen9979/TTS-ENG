@@ -2,13 +2,19 @@ import os
 import sys
 from scipy.io.wavfile import write, read
 import sounddevice as sd
-import select
-from .config import VOICE_PRESETS, TEXT_SAMPLES, LANGUAGE_NATIVE_NAMES, PROGRESS_BAR_WIDTH, PROGRESS_BAR_CHAR, REMAINING_BAR_CHAR
-from .tts_utils import generate_audio_chunk
-from tqdm import tqdm
 import time
-from .ui import clear_screen, generate_centered_ascii_title
 import re
+from tqdm import tqdm
+from .config import VOICE_PRESETS, TEXT_SAMPLES, LANGUAGE_NATIVE_NAMES, PROGRESS_BAR_CHAR, REMAINING_BAR_CHAR
+from .tts_utils import generate_audio_chunk
+from .ui import clear_screen, generate_centered_ascii_title
+
+# Kiểm tra hệ điều hành để import thư viện tương ứng
+IS_WINDOWS = sys.platform == "win32"
+if IS_WINDOWS:
+    import msvcrt
+else:
+    import select
 
 def display_voice_menu_grid(presets):
     try:
@@ -47,15 +53,17 @@ def display_voice_menu_grid(presets):
             print("".join(item.ljust(max_len) for item in row_items))
 
 def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_rate, cache_dir):
+    # Di chuyển việc tạo thư mục vào trong điều kiện
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
-        print(f" -> Đã tạo thư mục cache lần đầu tại: {cache_dir}")
+        # print(f" -> Đã tạo thư mục cache lần đầu tại: {cache_dir}")
 
-    filename = voice_preset_name.replace("/", "_") + ".wav"
+    filename = voice_preset_name.replace("/", "_").replace("\\", "_") + ".wav" # Thêm replace cho Windows
     filepath = os.path.join(cache_dir, filename)
 
     if os.path.exists(filepath):
-        print(f"\nĐang đọc giọng '{voice_preset_name}'")
+        # Thông báo này có thể không cần thiết, làm rối màn hình
+        # print(f"\nĐang đọc giọng '{voice_preset_name}' từ cache") 
         rate, audio_data = read(filepath)
         return audio_data
 
@@ -71,78 +79,75 @@ def get_audio_from_cache(voice_preset_name, model, processor, device, sampling_r
 
 def play_audio_with_progress(audio_data, sampling_rate, voice_name):
     """
-    Phát một đoạn audio, hiển thị nhãn văn bản, thanh tiến trình và thời gian.
-    Giao diện sẽ tự động co giãn theo kích thước terminal.
-    Cho phép người dùng nhấn Enter để dừng phát.
+    Phát audio với thanh tiến trình, hỗ trợ đa nền tảng (Windows, macOS, Linux).
     """
     try:
         duration = len(audio_data) / sampling_rate
-        sd.play(audio_data, sampling_rate)
+        sd.play(audio_data, sampling_rate, blocking=False)
         
         start_time = time.time()
         
-        # In thông báo ban đầu
-        print(f"\n▶️  Đang chuẩn bị phát: {voice_name}")
-        print("\n(Nhấn Enter để dừng bất kỳ lúc nào)")
+        print(f"\n▶️  Phát giọng: {voice_name} | (Nhấn phím bất kỳ để dừng...)")
         print()
 
-        # Trích xuất tên giọng đọc ngắn gọn để hiển thị trên thanh tiến trình
         voice_display_short = voice_name.split('-', 1)[-1].strip()
         text_label = f"Playing: {voice_display_short}"
 
         while True:
             elapsed_time = time.time() - start_time
-            if elapsed_time > duration:
-                break # Âm thanh đã phát xong
+            if elapsed_time >= duration:
+                break
 
-            # Kiểm tra xem người dùng có nhấn phím nào không
-            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                sys.stdin.readline()
-                print("\n\n⏹️  Đã dừng phát.")
+            # --- KIỂM TRA INPUT ĐA NỀN TẢNG ---
+            key_pressed = False
+            if IS_WINDOWS:
+                if msvcrt.kbhit(): # Kiểm tra xem có phím nào được nhấn không
+                    msvcrt.getch() # Đọc và bỏ qua phím đó
+                    key_pressed = True
+            else:
+                if select.select([sys.stdin], [], [], 0)[0]:
+                    sys.stdin.readline()
+                    key_pressed = True
+            
+            if key_pressed:
                 sd.stop()
+                print("\n\n⏹️  Đã dừng phát.")
                 return
 
-            # --- TÍNH TOÁN ĐỘ RỘNG THANH TIẾN TRÌNH MỘT CÁCH LINH HOẠT ---
+            # --- TÍNH TOÁN VÀ VẼ THANH TIẾN TRÌNH ---
             try:
                 terminal_width = os.get_terminal_size().columns
             except OSError:
                 terminal_width = 80
             
-            # Tính toán không gian cho các phần tử khác (lề, nhãn, thời gian)
-            padding = 5 # Giữ lề 5 ký tự ở đầu
+            padding = 5
             time_info_str = f"{elapsed_time:.1f}s / {duration:.1f}s"
             
-            # Tổng không gian đã chiếm bởi các yếu tố không phải thanh tiến trình
-            # Gồm: lề trái + nhãn text + khoảng cách + cặp ngoặc [] + khoảng cách + chuỗi thời gian
-            other_elements_width = padding + len(text_label) + len(" [] ") + len(time_info_str)
+            # Tính toán không gian đã chiếm bởi các yếu tố khác
+            other_elements_width = padding + len(text_label) + len(" [] ") + len(time_info_str) + padding
             
-            # Độ rộng cuối cùng của thanh tiến trình
-            progress_bar_width = max(10, terminal_width - other_elements_width - padding) # Trừ đi lề phải 10
+            progress_bar_width = max(10, terminal_width - other_elements_width)
 
-            # --- VẼ THANH TIẾN TRÌNH ---
-            progress_percent = elapsed_time / duration
+            progress_percent = min(1.0, elapsed_time / duration) # Đảm bảo không vượt quá 100%
             filled_len = int(progress_bar_width * progress_percent)
             bar = PROGRESS_BAR_CHAR * filled_len + REMAINING_BAR_CHAR * (progress_bar_width - filled_len)
             
-            # Tạo chuỗi hiển thị hoàn chỉnh
             display_line = f"{' ' * padding}{text_label} [{bar}] {time_info_str}"
             
-            # In ra màn hình, .ljust để đảm bảo ghi đè toàn bộ dòng cũ
             print(f"\r{display_line.ljust(terminal_width - 1)}", end="")
 
-            time.sleep(1)
+            time.sleep(0.1) # Cập nhật 10 lần/giây cho mượt mà
 
-        # Xóa dòng tiến trình sau khi hoàn tất
-        print("\r" + " " * (terminal_width - 1) + "\r", end="")
-        print("\n✅ Hoàn tất.")
+        # Dọn dẹp sau khi phát xong
         sd.stop()
-
+        print("\r" + " " * (terminal_width - 1) + "\r", end="") # Xóa dòng tiến trình
+        # print("✅ Hoàn tất.")
     except Exception as e:
-        print(f"\nLỗi khi phát âm thanh: {e}")
+        print(f"\n❌ Lỗi khi phát âm thanh: {e}")
         sd.stop()
 
 def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
-    """Chạy vòng lặp menu cho chức năng Jukebox với menu phân cấp."""
+    """Chạy vòng lặp menu với menu phân cấp."""
     try:
         while True:
             # --- MENU CHỌN NGÔN NGỮ ---
