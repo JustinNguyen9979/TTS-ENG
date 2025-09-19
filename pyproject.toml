@@ -57,7 +57,9 @@ dependencies = [
     "vocos",
     "wandb",
     "x_transformers>=1.31.14",
-    "openai-whisper"
+    "openai-whisper",
+    "ffmpeg",
+    "f5-tts"
 ]
 
 [tool.setuptools]
