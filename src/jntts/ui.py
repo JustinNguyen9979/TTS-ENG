@@ -2,6 +2,7 @@ import os
 import pyfiglet
 import textwrap
 import wcwidth
+import random
 
 from rich.console import Console
 from rich.panel import Panel
@@ -184,15 +185,30 @@ def generate_centered_ascii_title(text, font='standard'):
     return centered_banner
 
 def display_main_menu():
+    """Hiển thị menu chính với màu sắc ngẫu nhiên."""
     clear_screen()
     
-    print(generate_centered_ascii_title("TOOL TEXT TO SPEECH"))
+    # --- LOGIC CHỌN MÀU NGẪU NHIÊN ---
+    # Danh sách các màu sắc tươi sáng, đẹp mắt từ thư viện Rich
+    bright_colors = [
+        "bright_cyan",
+        "bright_magenta",
+        "bright_yellow",
+        "bright_green",
+        "bright_blue",
+        "bright_red",
+    ]
+    # Chọn một màu ngẫu nhiên từ danh sách trên
+    random_color = random.choice(bright_colors)
+
+    # In tiêu đề ASCII Art với màu ngẫu nhiên
+    ascii_title = generate_centered_ascii_title("TOOL TEXT TO SPEECH")
+    console.print(Text(ascii_title, style=f"bold {random_color}"))
     
-    try:
-        terminal_width = os.get_terminal_size().columns
-    except OSError:
-        terminal_width = 79
-    
+    # In phiên bản
+    console.print(Align.center(Text(VERSION, style="italic dim")))
+
+    # --- XÂY DỰNG NỘI DUNG MENU BẰNG RICH ---
     menu_items = [
         "Nghe thử giọng nói (Box Voice)",
         "Tạo giọng nói (Text To Speech)",
@@ -201,10 +217,65 @@ def display_main_menu():
         "Kiểm tra phần cứng (Check CPU/GPU)",
         "Thông tin & Giới thiệu (About)"
     ]
-        
-    print(f"{VERSION.center(terminal_width)}")
-    print("\n" + "=" * terminal_width)
+
+    menu_content = Text()
     for i, item in enumerate(menu_items):
-        print(f"\n  [{i+1}]. {item}")
-    print("\n  [0]. Thoát chương trình (Exit)")
-    print("\n" + "=" * terminal_width)
+        # Định dạng số và mục menu với các màu khác nhau
+        menu_content.append(f"  [", style="default")
+        menu_content.append(str(i + 1), style=f"bold {random_color}")
+        menu_content.append(f"]. {item}\n\n", style="default")
+
+    # Thêm lựa chọn thoát
+    menu_content.append(f"  [", style="default")
+    menu_content.append("0", style=f"bold {random_color}")
+    menu_content.append(f"]. Thoát chương trình (Exit)\n", style="default")
+
+    # Tạo một Panel (hộp) để chứa menu
+    menu_panel = Panel(
+        menu_content,
+        border_style=random_color, # Viền của hộp cũng có màu ngẫu nhiên
+        title="[bold]CHỌN CHỨC NĂNG[/bold]",
+        title_align="center",
+        padding=(1, 2)
+    )
+
+    # In menu ra giữa màn hình
+    console.print(Align.center(menu_panel))
+
+def display_selection_menu(title, options, color="cyan", back_option="Quay lại menu trước"):
+    """
+    Hiển thị một menu lựa chọn chung với phong cách của Rich.
+    
+    Args:
+        title (str): Tiêu đề của menu (ví dụ: "Chọn một ngôn ngữ").
+        options (list): Danh sách các chuỗi lựa chọn.
+        color (str): Màu sắc chủ đạo cho menu.
+        back_option (str): Văn bản cho lựa chọn quay lại (số 0).
+    
+    Returns:
+        str: Lựa chọn của người dùng.
+    """
+    menu_content = Text()
+    for i, item in enumerate(options):
+        # Loại bỏ số thứ tự cũ nếu có (ví dụ: "1. English - Male 1")
+        item_text = re.sub(r'^\d+\.\s*', '', item)
+        menu_content.append(f"  [", style="default")
+        menu_content.append(str(i + 1), style=f"bold {color}")
+        menu_content.append(f"]. {item_text}\n\n", style="default")
+
+    menu_content.append(f"  [", style="default")
+    menu_content.append("0", style=f"bold {color}")
+    menu_content.append(f"]. {back_option}\n", style="default")
+
+    menu_panel = Panel(
+        menu_content,
+        title=f"[bold]{title}[/bold]",
+        title_align="center",
+        border_style=color,
+        padding=(1, 2)
+    )
+    
+    console.print(Align.center(menu_panel))
+    
+    choice = input(f"\nNhập lựa chọn của bạn (0 để quay lại): ")
+    return choice
