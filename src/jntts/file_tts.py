@@ -240,10 +240,9 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
 
                         # --- BƯỚC HẬU KỲ ÂM TRẦM (NẾU CẦN) ---
                         if bass_boost_db > 0:
-                            # print("\nÁp dụng hiệu ứng âm trầm một cách thầm lặng...") # Dòng này có thể bật để debug
-                            boosted_file_map = {} # Dùng để ánh xạ tên file cũ sang tên file mới
+                            # print("\nÁp dụng hiệu ứng âm trầm...") # Debug
                             
-                            # Thay thế tqdm bằng vòng lặp thường để không hiển thị progress bar
+                            # Vòng lặp này sẽ thực hiện việc tăng âm trầm và XÓA file gốc
                             for file_info in generated_files_info:
                                 file_path = file_info['path']
                                 try:
@@ -252,27 +251,14 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                                     boosted_audio = np.clip(boosted_audio, -1.0, 1.0)
                                     boosted_audio = (boosted_audio * 32767).astype(np.int16)
                                     
-                                    # Tạo tên file mới
                                     base, ext = os.path.splitext(file_path)
                                     new_filepath = f"{base}_B{bass_boost_db}{ext}"
                                     
-                                    # Ghi file mới đã được làm ấm
                                     write(new_filepath, rate, boosted_audio)
-                                    
-                                    # XÓA FILE GỐC
-                                    os.remove(file_path)
-                                    
-                                    # Lưu lại sự thay đổi tên file
-                                    original_filename = file_info['original_name']
-                                    new_filename = os.path.basename(new_filepath)
-                                    boosted_file_map[original_filename] = new_filename
+                                    os.remove(file_path) # Xóa file gốc
                                     
                                 except Exception as e:
-                                    # In lỗi ra nếu có sự cố, nhưng không hiển thị progress bar
-                                    print(f"\n⚠️ Lỗi khi xử lý hậu kỳ file '{os.path.basename(file_path)}': {e}")
-                            
-                            # Cập nhật lại danh sách log cuối cùng với các tên file mới
-                            final_log = [boosted_file_map.get(log, log) for log in processed_files_log]
+                                    print(f"\n⚠️ Lỗi khi tăng âm trầm cho file '{os.path.basename(file_path)}': {e}")
 
                         # --- BÁO CÁO TỔNG KẾT ---
                         try:
@@ -281,8 +267,21 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                         dash_line = "-" * terminal_width
                         print(f"\n{dash_line}")
 
+                        # Xây dựng lại danh sách log cuối cùng để hiển thị
+                        final_log = []
+                        for file_info in generated_files_info:
+                            # Lấy tên file gốc từ thông tin đã lưu
+                            original_filename_base, ext = os.path.splitext(file_info['original_name'])
+                            
+                            # Thêm hậu tố âm trầm nếu có
+                            bass_suffix = f"_B{bass_boost_db}" if bass_boost_db > 0 else ""
+                            
+                            # Tạo tên file cuối cùng hoàn chỉnh
+                            final_filename = f"{original_filename_base}{bass_suffix}{ext}"
+                            final_log.append(final_filename)
+
                         if not final_log:
-                            print("Không có file nào được xử lý thành công.".center(terminal_width))
+                            print("Không có file audio nào được xử lý thành công.".center(terminal_width))
                         else:
                             print("\n✅ XỬ LÝ HOÀN TẤT!".center(terminal_width))
                             print("\nCác file sau đã được tạo thành công:".center(terminal_width))
