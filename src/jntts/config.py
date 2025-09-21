@@ -180,6 +180,39 @@ LANGUAGE_NATIVE_NAMES = {
     "hi": "🇮🇳 Ấn Độ 🇮🇳",
 }
 
+import time
+
+class Timer:
+    """Một lớp helper đơn giản để đo lường thời gian thực thi."""
+    def __init__(self):
+        self.start_time = None
+        self.end_time = None
+
+    def start(self):
+        """Bắt đầu đếm giờ."""
+        self.start_time = time.time()
+
+    def stop(self):
+        """Dừng đếm giờ."""
+        self.end_time = time.time()
+
+    def elapsed_formatted(self):
+        """
+        Tính toán và trả về thời gian đã trôi qua dưới dạng chuỗi đã được định dạng.
+        Ví dụ: "1 phút 25 giây", "5.3 giây".
+        """
+        if self.start_time is None or self.end_time is None:
+            return "Chưa xác định"
+        
+        elapsed_seconds = self.end_time - self.start_time
+        
+        minutes = int(elapsed_seconds // 60)
+        seconds = elapsed_seconds % 60
+        
+        if minutes > 0:
+            return f"{minutes} phút {seconds:.1f} giây"
+        else:
+            return f"{seconds:.1f} giây"
 
 def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_for_bass_boost=True):
     """

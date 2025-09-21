@@ -10,7 +10,7 @@ from tqdm import tqdm # Giữ nguyên import
 from .file_tts import find_and_sort_input_files
 from .ui import clear_screen, generate_centered_ascii_title
 from contextlib import redirect_stdout, redirect_stderr
-from .config import prompt_for_audio_settings
+from .config import prompt_for_audio_settings, Timer
 from scipy.signal import butter, filtfilt
 
 try:
@@ -114,6 +114,9 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
         bass_info = f"Âm trầm = {bass_boost_db}" if bass_boost_db > 0 else "Âm trầm = Không"
         
         print(f"\n   -> Cấu hình: {speed_info} | {stability_info} | {bass_info}")
+
+        clone_timer = Timer()
+        clone_timer.start()
         
         print("\nBước 2: Đang nhận dạng giọng nói mẫu...")
         ref_text = ""
@@ -272,18 +275,41 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
             pbar.set_description("Hoàn tất!")
 
         try:
-            terminal_width = os.get_terminal_size().columns
+            clone_timer.stop() # Dừng đếm giờ
+            
+            # Khởi tạo terminal_width với giá trị mặc định trước
+            terminal_width = 80 
+            try:
+                # Cố gắng lấy kích thước thật
+                terminal_width = os.get_terminal_size().columns
+            except OSError:
+                pass # Nếu lỗi thì vẫn dùng giá trị mặc định 80
+
             dash_line = "-" * terminal_width
             print(f"\n{dash_line}")
-            print("✅ XUẤT FILE AUDIO THÀNH CÔNG!".center(terminal_width))
+
+            # Xây dựng các chuỗi thông báo
+            header_msg = "✅ XUẤT FILE AUDIO THÀNH CÔNG!"
+            time_msg = f"Tổng thời gian xử lý: {clone_timer.elapsed_formatted()}"
+
+            # In các chuỗi đã được căn giữa
+            print(header_msg.center(terminal_width))
+            print("\n" + time_msg.center(terminal_width))
+
             if processed_files_log:
-                print("\nCác file sau đã được tạo thành công:".center(terminal_width))
+                files_header_msg = "Các file sau đã được tạo thành công:"
+                print("\n" + files_header_msg)
+                # Danh sách file thì nên căn trái, thụt vào đầu dòng cho đẹp
                 for log_entry in processed_files_log:
-                    print(f"  - {log_entry}".center(terminal_width))
+                    print(f"  - {log_entry}")
             else:
-                print("Không có file nào được xử lý thành công.".center(terminal_width))
+                no_files_msg = "Không có file nào được xử lý thành công."
+                print("\n" + no_files_msg.center(terminal_width))
+                
             print(dash_line)
-        except OSError: pass
+        except Exception as e:
+            # Bắt lỗi chung để báo cáo nếu có sự cố bất ngờ
+            print(f"\n❌ Đã xảy ra lỗi trong quá trình báo cáo: {e}")
 
     except KeyboardInterrupt:
         print("\n\nĐã dừng xử lý. Quay lại menu chính...")

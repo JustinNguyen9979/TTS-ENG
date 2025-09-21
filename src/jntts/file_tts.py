@@ -4,7 +4,7 @@ import re
 import numpy as np
 import time
 from scipy.io.wavfile import write, read
-from .config import VOICE_PRESETS, LANGUAGE_NATIVE_NAMES, prompt_for_audio_settings
+from .config import VOICE_PRESETS, LANGUAGE_NATIVE_NAMES, prompt_for_audio_settings, Timer
 from .tts_utils import generate_audio_chunk
 from tqdm import tqdm
 from scipy.signal import butter, filtfilt
@@ -152,6 +152,11 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                         voice_info = f"Giọng = '{voice_display_short}'"
 
                         print(f"\n   -> Cấu hình: {speed_info}, {stability_info}, {bass_info}, {voice_info}")
+
+                        tts_timer = Timer() # <-- KHỞI TẠO TIMER
+                        tts_timer.start()   # <-- BẮT ĐẦU ĐẾM GIỜ
+
+                        files_to_process = initial_files.copy()
                         
                         # --- BẮT ĐẦU XỬ LÝ FILE (SAU KHI ĐÃ CHỌN GIỌNG) ---
                         files_to_process = initial_files.copy()
@@ -164,9 +169,10 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                             try:
                                 terminal_width = os.get_terminal_size().columns
                             except OSError: terminal_width = 80
-                            header_text = f" Bắt đầu xử lý file: {os.path.basename(file_path)} "
+                            header_text = f" Đang xử lý file: {os.path.basename(file_path)} "
                             full_header_line = header_text.center(terminal_width, '-')
                             print(f"\n{full_header_line}")
+                            print()
                             try:
                                 with open(file_path, 'r', encoding='utf-8') as f:
                                     full_text = f.read().strip()
@@ -259,6 +265,7 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                                     
                                 except Exception as e:
                                     print(f"\n⚠️ Lỗi khi tăng âm trầm cho file '{os.path.basename(file_path)}': {e}")
+                        tts_timer.stop()
 
                         # --- BÁO CÁO TỔNG KẾT ---
                         try:
@@ -270,21 +277,25 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                         # Xây dựng lại danh sách log cuối cùng để hiển thị
                         final_log = []
                         for file_info in generated_files_info:
-                            # Lấy tên file gốc từ thông tin đã lưu
                             original_filename_base, ext = os.path.splitext(file_info['original_name'])
-                            
-                            # Thêm hậu tố âm trầm nếu có
                             bass_suffix = f"_B{bass_boost_db}" if bass_boost_db > 0 else ""
-                            
-                            # Tạo tên file cuối cùng hoàn chỉnh
                             final_filename = f"{original_filename_base}{bass_suffix}{ext}"
                             final_log.append(final_filename)
 
                         if not final_log:
                             print("Không có file audio nào được xử lý thành công.".center(terminal_width))
                         else:
-                            print("\n✅ XỬ LÝ HOÀN TẤT!".center(terminal_width))
-                            print("\nCác file sau đã được tạo thành công:".center(terminal_width))
+                            # Tách các chuỗi ra để code rõ ràng hơn
+                            header_msg = "✅ XỬ LÝ HOÀN TẤT!"
+                            time_msg = f"Tổng thời gian xử lý: {tts_timer.elapsed_formatted()}"
+                            files_header_msg = "Các file sau đã được tạo thành công:"
+
+                            # In các chuỗi đã được căn giữa
+                            print("\n" + header_msg.center(terminal_width))
+                            print("\n" + time_msg.center(terminal_width))
+                            print("\n" + files_header_msg)
+                            
+                            # Danh sách file thì nên căn trái cho dễ đọc
                             for log_entry in final_log:
                                 print(f"  - {log_entry}")
                         
