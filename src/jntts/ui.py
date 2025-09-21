@@ -5,10 +5,11 @@ import wcwidth
 import random
 import re
 
-from rich.console import Console
-from rich.panel import Panel
+from rich.table import Table
 from rich.text import Text
 from rich.align import Align
+from rich.panel import Panel
+from rich.console import Console
 
 console = Console()
 
@@ -245,29 +246,32 @@ def display_main_menu():
 
 def display_selection_menu(title, options, color="cyan", back_option="Quay lại menu trước"):
     """
-    Hiển thị một menu lựa chọn chung với phong cách của Rich.
-    
-    Args:
-        title (str): Tiêu đề của menu (ví dụ: "Chọn một ngôn ngữ").
-        options (list): Danh sách các chuỗi lựa chọn.
-        color (str): Màu sắc chủ đạo cho menu.
-        back_option (str): Văn bản cho lựa chọn quay lại (số 0).
-    
-    Returns:
-        str: Lựa chọn của người dùng.
+    Hiển thị một menu lựa chọn chung với phong cách đơn giản và đáng tin cậy,
+    giống hệt như menu chính để đảm bảo tính ổn định tuyệt đối.
     """
+    # Xây dựng nội dung menu bằng Text object.
     menu_content = Text()
+    
     for i, item in enumerate(options):
-        # Loại bỏ số thứ tự cũ nếu có (ví dụ: "1. English - Male 1")
-        item_text = re.sub(r'^\d+\.\s*', '', item)
+        # Chuyển đổi item thành chuỗi để xử lý nhất quán
+        if isinstance(item, tuple):
+            # Nếu là tuple ('key', 'value'), ghép chúng lại thành một chuỗi
+            item_text = f"{item[0]:<12} - {item[1]}"
+        else:
+            # Nếu là chuỗi, xóa số thứ tự cũ (nếu có)
+            item_text = re.sub(r'^\d+\.\s*', '', str(item))
+        
+        # Thêm từng dòng lựa chọn vào menu
         menu_content.append(f"  [", style="default")
         menu_content.append(str(i + 1), style=f"bold {color}")
         menu_content.append(f"]. {item_text}\n\n", style="default")
 
+    # Thêm lựa chọn quay lại
     menu_content.append(f"  [", style="default")
     menu_content.append("0", style=f"bold {color}")
     menu_content.append(f"]. {back_option}\n", style="default")
 
+    # Đặt nội dung vào trong một Panel
     menu_panel = Panel(
         menu_content,
         title=f"[bold]{title}[/bold]",
@@ -276,7 +280,9 @@ def display_selection_menu(title, options, color="cyan", back_option="Quay lại
         padding=(1, 2)
     )
     
+    # In Panel ra giữa màn hình
     console.print(Align.center(menu_panel))
     
-    choice = input(f"\nNhập lựa chọn của bạn (0 để quay lại): ")
+    # Lấy lựa chọn của người dùng
+    choice = input(f"\nNhập lựa chọn của bạn (00 để về menu chính): ")
     return choice

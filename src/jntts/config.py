@@ -234,16 +234,13 @@ def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_
         'stability': 2.0,
         'bass_boost': 0
     }
-    
-    # print("\n" + "-"*50)
-    # print("TÙY CHỈNH ÂM THANH".center(50))
-    # print("-" * 50)
 
     # --- Hỏi về Tốc độ (nếu được yêu cầu) ---
     if ask_for_speed:
         while True:
             prompt = f"\n -> Nhập tốc độ nói (ví dụ: 0.9, 1.2). Mặc định [{defaults['speed']}] nhấn (Enter)): "
             speed_input = input(prompt).strip()
+            if speed_input == '00': return None # Tín hiệu thoát
             if not speed_input:
                 settings['speed'] = None
                 break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
@@ -258,6 +255,7 @@ def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_
         while True:
             prompt = f"\n -> Nhập độ ổn định (ví dụ: 2.0, 2.5). Mặc định [{defaults['stability']}] nhấn (Enter)): "
             cfg_input = input(prompt).strip()
+            if cfg_input == '00': return None # Tín hiệu thoát
             if not cfg_input:
                 settings['stability'] = None
                 break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp
@@ -274,6 +272,7 @@ def prompt_for_audio_settings(ask_for_speed=False, ask_for_stability=False, ask_
         while True:
             prompt = f"\n -> Nhập mức tăng âm trầm ({BASS_BOOST_MIN}-{BASS_BOOST_MAX}). Mặc định [{defaults['bass_boost']}] nhấn (Enter)): "
             bass_input = input(prompt).strip()
+            if bass_input == '00': return None # Tín hiệu thoát
             if not bass_input:
                 settings['bass_boost'] = 0
                 break # Người dùng nhấn Enter -> chấp nhận mặc định và thoát vòng lặp

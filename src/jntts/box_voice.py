@@ -7,7 +7,11 @@ import re
 from tqdm import tqdm
 from .config import VOICE_PRESETS, TEXT_SAMPLES, LANGUAGE_NATIVE_NAMES, PROGRESS_BAR_CHAR, REMAINING_BAR_CHAR
 from .tts_utils import generate_audio_chunk
-from .ui import clear_screen, generate_centered_ascii_title, display_selection_menu
+from .ui import clear_screen, display_selection_menu, generate_centered_ascii_title
+from rich.console import Console
+from rich.text import Text
+
+console = Console()
 
 # Kiểm tra hệ điều hành để import thư viện tương ứng
 IS_WINDOWS = sys.platform == "win32"
@@ -152,6 +156,9 @@ def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
         while True:
             # --- MENU CHỌN NGÔN NGỮ ---
             clear_screen()
+
+            ascii_title = generate_centered_ascii_title("Box Voice") # Giữ lại ASCII art
+            console.print(Text(ascii_title, style="bold bright_cyan")) # Tô màu cho nó
             
             voices_by_lang = {}
             for key, value in VOICE_PRESETS.items():
@@ -168,6 +175,7 @@ def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
             lang_choice = display_selection_menu("Chọn một ngôn ngữ", lang_options, color="bright_cyan", back_option="Quay lại menu chính")
             
             if lang_choice == '0': break
+            if lang_choice == '00': return
 
             try:
                 lang_choice_num = int(lang_choice)
@@ -180,12 +188,15 @@ def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
                 # --- MENU CHỌN GIỌNG NÓI ---
                 while True:
                     clear_screen()
+                    ascii_title = generate_centered_ascii_title("Box Voice") # Giữ lại ASCII art
+                    console.print(Text(ascii_title, style="bold bright_cyan")) # Tô màu cho nó
                     native_name = LANGUAGE_NATIVE_NAMES.get(VOICE_PRESETS[voices_in_lang[0]]['lang'], '')
                     menu_title = f"Chọn giọng nói ({selected_lang} - {native_name})"
                     
-                    voice_choice = display_selection_menu(menu_title, voices_in_lang, color="bright_magenta", back_option="Quay lại menu ngôn ngữ")
+                    voice_choice = display_selection_menu(menu_title, voices_in_lang, color="bright_cyan", back_option="Quay lại menu ngôn ngữ")
                     
                     if voice_choice == '0': break
+                    if voice_choice == '00': return
 
                     try:
                         # Logic xử lý lựa chọn giọng nói không thay đổi

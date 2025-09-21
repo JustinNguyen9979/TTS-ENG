@@ -12,6 +12,10 @@ from .ui import clear_screen, generate_centered_ascii_title
 from contextlib import redirect_stdout, redirect_stderr
 from .config import prompt_for_audio_settings, Timer
 from scipy.signal import butter, filtfilt
+from rich.console import Console
+from rich.text import Text
+
+console = Console()
 
 try:
     import whisper
@@ -83,7 +87,8 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
         
     try:
         clear_screen()
-        print(generate_centered_ascii_title("Voice Cloning"))
+        ascii_title = generate_centered_ascii_title("Voice Cloning")
+        console.print(Text(ascii_title, style="bold bright_yellow"))
 
         voice_dir = os.path.join(downloads_path, "jntts", "Voice")
         print(f"\nBước 1: Chọn cấu hình Voice Cloning...")
@@ -98,6 +103,9 @@ def run_voice_cloning(input_dir, output_dir, downloads_path):
             ask_for_stability=True, 
             ask_for_bass_boost=True
         )
+
+        if audio_settings is None:
+            return
 
         # Gán các giá trị vào biến để sử dụng trong code phía dưới
         user_speed = audio_settings['speed']

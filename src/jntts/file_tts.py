@@ -10,6 +10,12 @@ from tqdm import tqdm
 from scipy.signal import butter, filtfilt
 from .ui import clear_screen, generate_centered_ascii_title, display_selection_menu
 from .box_voice import display_voice_menu_grid
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+from rich.align import Align
+
+console = Console()
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -65,6 +71,8 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
     try:
         while True:
             clear_screen()
+            ascii_title = generate_centered_ascii_title("Text To Speech") # Giữ lại ASCII art
+            console.print(Text(ascii_title, style="bold bright_yellow")) # Tô màu cho nó
             
             initial_files = find_and_sort_input_files(input_dir)
             if not initial_files:
@@ -73,7 +81,7 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                 input("\nNhấn Enter để quay lại menu chính...")
                 return
             
-            print(f"\nĐã tìm thấy {len(initial_files)} file.")
+            # print(f"\nĐã tìm thấy {len(initial_files)} file.")
             
             # --- MENU CHỌN NGÔN NGỮ ---
             voices_by_lang = {}
@@ -87,6 +95,7 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
 
             lang_choice = display_selection_menu("Chọn ngôn ngữ cho giọng đọc", lang_options, color="bright_yellow", back_option="Quay lại menu chính")
             if lang_choice == '0': return
+            if lang_choice == '00': return
 
             try:
                 lang_choice_num = int(lang_choice)
@@ -99,11 +108,14 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                 # --- MENU CHỌN GIỌNG NÓI ---
                 while True:
                     clear_screen()
+                    ascii_title = generate_centered_ascii_title("Text To Speech") # Giữ lại ASCII art
+                    console.print(Text(ascii_title, style="bold bright_yellow")) # Tô màu cho nó
                     native_name = LANGUAGE_NATIVE_NAMES.get(VOICE_PRESETS[voices_in_lang[0]]['lang'], '')
                     menu_title = f"Chọn giọng nói cụ thể ({selected_lang} - {native_name})"
                     
-                    choice = display_selection_menu(menu_title, voices_in_lang, color="bright_green", back_option="Quay lại menu chọn ngôn ngữ")
+                    choice = display_selection_menu(menu_title, voices_in_lang, color="bright_yellow", back_option="Quay lại menu chọn ngôn ngữ")
                     if choice == '0': break
+                    if choice == '00': return
 
                     try:
                         choice_num = int(choice)
@@ -114,6 +126,8 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                         
                         # --- BẮT ĐẦU PHẦN LOGIC XỬ LÝ CHÍNH ---
                         clear_screen()
+                        ascii_title = generate_centered_ascii_title("Text To Speech") # Giữ lại ASCII art
+                        console.print(Text(ascii_title, style="bold bright_yellow")) # Tô màu cho nó
                         
                         voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
                         lang_code = VOICE_PRESETS[selected_display_name]["lang"]
@@ -125,6 +139,9 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                             ask_for_stability=True, 
                             ask_for_bass_boost=True
                         )
+
+                        if audio_settings is None:
+                            break
 
                         user_speed = audio_settings['speed']
                         user_cfg_strength = audio_settings['stability']
@@ -155,7 +172,6 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                             header_text = f" Đang xử lý file: {os.path.basename(file_path)} "
                             print(f"\n{header_text.center(terminal_width, '-')}\n")
 
-                            # ... (Logic đọc file và xử lý câu giữ nguyên) ...
                             try:
                                 with open(file_path, 'r', encoding='utf-8') as f:
                                     full_text = f.read().strip()
