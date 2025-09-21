@@ -1,9 +1,12 @@
 import torch
-import os
 import psutil
+
 from cpuinfo import get_cpu_info
 from .config import MIN_RAM_GB, MIN_VRAM_GB
-from .ui import generate_centered_ascii_title, clear_screen
+from .ui import clear_screen, print_info_box, print_highlight_box
+from rich.console import Console 
+from rich.text import Text
+from rich.align import Align
 
 try:
     import pynvml
@@ -57,57 +60,45 @@ def evaluate_specs(specs):
     return not failure_reasons, failure_reasons
 
 def run_hardware_check():
-    """Hàm chính để chạy toàn bộ quy trình kiểm tra và hiển thị."""
+    """Chạy quy trình kiểm tra và hiển thị bằng box thông tin chung."""
     clear_screen()
-    print(generate_centered_ascii_title("Hardware Check", font='small'))
     
     specs = get_system_specs()
     is_sufficient, reasons = evaluate_specs(specs)
     
-    info_data = [
+    # Chuẩn bị dữ liệu cho box
+    system_data = [
         ('CPU', f"{specs['cpu_model']} ({specs['cpu_cores']} cores)"),
         ('RAM', f"{specs['ram_total_gb']} GB (Khả dụng: {specs['ram_available_gb']} GB)"),
         ('GPU', f"{specs['gpu_model']}")
     ]
     if specs['compute_platform'] != "CPU":
-        info_data.append(('VRAM', f"{specs['gpu_vram_total_gb']} GB"))
-        info_data.append(('Nền tảng', f"{specs['compute_platform']}"))
+        system_data.append(('VRAM', f"{specs['gpu_vram_total_gb']} GB"))
+        system_data.append(('Nền tảng', f"{specs['compute_platform']}"))
 
-    label_width = max(len(label) for label, value in info_data)
-
-    formatted_lines = [f"{label.ljust(label_width)} : {value}" for label, value in info_data]
+    # Tạo cấu trúc sections
+    sections = {
+        "Thông tin hệ thống": system_data
+    }
     
-    max_line_length = max(len(line) for line in formatted_lines)
-    title = "--- THÔNG TIN HỆ THỐNG ---"
-    box_width = max(max_line_length, len(title))
+    # Gọi hàm để vẽ box
+    print_info_box("Hardware Check", sections)
     
-    dash_line = "-" * (box_width + 4) 
-
-    print(f"\n{dash_line}")
-    print(title.center(len(dash_line)))
-    for line in formatted_lines:
-        # In mỗi dòng với 2 khoảng trắng đệm ở bên trái
-        print(f"\n  {line}")
-    print(dash_line)
+    # In kết quả kiểm tra
+    device_line = f"Ưu tiên sử dụng: {specs['active_device'].upper()}"
     
-    print(f"\n➡️ Chương trình ưu tiên sử dụng: {specs['active_device'].upper()}")
-
     if is_sufficient:
-        result_text = ">>> MÁY TÍNH ĐỦ ĐIỀU KIỆN <<<"
+        status_line = "HỆ THỐNG ĐỦ ĐIỀU KIỆN"
+        print_highlight_box([device_line, status_line], status='success')
     else:
-        result_text = ">>> MÁY TÍNH KHÔNG ĐỦ ĐIỀU KIỆN <<<"
+        status_line = "HỆ THỐNG CÓ THỂ KHÔNG ĐỦ ĐIỀU KIỆN"
+        print_highlight_box([device_line, status_line], status='warning')
         
-    result_line_length = len(result_text)
-    result_dash_line = "-" * result_line_length
-    
-    print(f"\n{result_dash_line}")
-    print(result_text)
-    print(result_dash_line)
-    
-    if not is_sufficient:
-        print("\nLý do:")
+        # In các lý do bên ngoài hộp (có thể tạo một Panel khác cho nó nếu muốn)
+        reasons_text = Text("\nLý do:\n", style="bold red")
         for reason in reasons:
-            print(reason)
-        print("\n*Lưu ý: Chương trình vẫn có thể chạy nhưng sẽ rất chậm hoặc gặp lỗi bộ nhớ.")
+            reasons_text.append(f" {reason}\n")
+        reasons_text.append("\n*Lưu ý: Chương trình vẫn có thể chạy nhưng sẽ rất chậm hoặc gặp lỗi bộ nhớ.")
+        Console.print(Align.center(reasons_text))
 
     input("\nNhấn Enter để quay lại menu chính...")

@@ -59,7 +59,8 @@ dependencies = [
     "x_transformers>=1.31.14",
     "openai-whisper",
     "ffmpeg",
-    "f5-tts"
+    "f5-tts",
+    "wcwidth"
 ]
 
 [tool.setuptools]
