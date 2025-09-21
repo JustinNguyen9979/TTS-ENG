@@ -6,7 +6,7 @@ import re
 import time
 import numpy as np
 from scipy.io.wavfile import write
-from tqdm import tqdm # Giữ nguyên import
+from tqdm import tqdm
 from .file_tts import find_and_sort_input_files
 from .ui import clear_screen, generate_centered_ascii_title
 from contextlib import redirect_stdout, redirect_stderr

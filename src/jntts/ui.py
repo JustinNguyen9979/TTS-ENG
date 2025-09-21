@@ -5,11 +5,12 @@ import wcwidth
 import random
 import re
 
-from rich.table import Table
 from rich.text import Text
 from rich.align import Align
 from rich.panel import Panel
 from rich.console import Console
+from rich.style import Style
+from rich.color import Color
 
 console = Console()
 
@@ -51,42 +52,6 @@ def _render_and_center_block(block_str):
     # Sử dụng textwrap.indent để thêm lề vào mỗi dòng của khối
     centered_block = textwrap.indent(block_str, left_padding_str)
     print(centered_block)
-
-# --- HÀM MASTER ĐỂ VẼ BOX (PRIVATE) ---
-def _draw_box_wrapper(content_lines, box_chars, color_code=COLOR_RESET, inner_padding=2):
-    """Hàm lõi, chịu trách nhiệm tính toán và vẽ mọi loại box."""
-    
-    # Helper để tính chiều rộng hiển thị thực tế của chuỗi (hỗ trợ emoji)
-    def display_width(s):
-        return wcwidth.wcswidth(s)
-
-    if not content_lines:
-        return
-
-    content_width = max(display_width(line) for line in content_lines)
-    box_width = content_width + (inner_padding * 2) + 2 # +2 cho viền dọc
-
-    try:
-        terminal_width = os.get_terminal_size().columns
-    except OSError:
-        terminal_width = 80
-        
-    left_padding_str = " " * ((terminal_width - box_width) // 2)
-
-    # Vẽ viền trên
-    top_border = box_chars['top_left'] + (box_chars['horizontal'] * (box_width - 2)) + box_chars['top_right']
-    print(color_code + left_padding_str + top_border + COLOR_RESET)
-
-    # Vẽ nội dung
-    for line in content_lines:
-        line_padding_right = " " * (content_width - display_width(line))
-        padded_line = f"{' ' * inner_padding}{line}{line_padding_right}{' ' * inner_padding}"
-        print(color_code + left_padding_str + box_chars['vertical'] + padded_line + box_chars['vertical'] + COLOR_RESET)
-
-    # Vẽ viền dưới
-    bottom_border = box_chars['bottom_left'] + (box_chars['horizontal'] * (box_width - 2)) + box_chars['bottom_right']
-    print(color_code + left_padding_str + bottom_border + COLOR_RESET)
-
 
 def print_info_box(title, sections):
     """
@@ -190,16 +155,42 @@ def display_main_menu():
     """Hiển thị menu chính với màu sắc ngẫu nhiên."""
     clear_screen()
     
-    # --- LOGIC CHỌN MÀU NGẪU NHIÊN ---
-    # Danh sách các màu sắc tươi sáng, đẹp mắt từ thư viện Rich
     bright_colors = [
+        # --- Các màu sáng cơ bản (tương phản cao) ---
         "bright_cyan",
         "bright_magenta",
         "bright_yellow",
         "bright_green",
         "bright_blue",
         "bright_red",
+        
+        # --- Các màu tông Lục và Lam (Greens & Blues) ---
+        "spring_green1",
+        "spring_green2",
+        "sea_green1",
+        "turquoise2",
+        "deep_sky_blue1",
+        "dodger_blue1",
+        "steel_blue1",
+        
+        # --- Các màu tông Vàng và Cam (Yellows & Oranges) ---
+        "gold1",
+        "dark_orange",
+        "orange1",
+        "light_goldenrod1",
+        
+        # --- Các màu tông Đỏ và Hồng (Reds & Pinks) ---
+        "light_coral",
+        "indian_red1",
+        "hot_pink",
+        "deep_pink1",
+        
+        # --- Các màu tông Tím (Purples) ---
+        "medium_purple",
+        "orchid",
+        "blue_violet"
     ]
+
     # Chọn một màu ngẫu nhiên từ danh sách trên
     random_color = random.choice(bright_colors)
 

@@ -9,11 +9,8 @@ from .tts_utils import generate_audio_chunk
 from tqdm import tqdm
 from scipy.signal import butter, filtfilt
 from .ui import clear_screen, generate_centered_ascii_title, display_selection_menu
-from .box_voice import display_voice_menu_grid
 from rich.console import Console
-from rich.panel import Panel
 from rich.text import Text
-from rich.align import Align
 
 console = Console()
 
