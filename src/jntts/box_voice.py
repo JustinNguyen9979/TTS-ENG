@@ -7,7 +7,7 @@ import re
 from tqdm import tqdm
 from .config import VOICE_PRESETS, TEXT_SAMPLES, LANGUAGE_NATIVE_NAMES, PROGRESS_BAR_CHAR, REMAINING_BAR_CHAR
 from .tts_utils import generate_audio_chunk
-from .ui import clear_screen, generate_centered_ascii_title
+from .ui import clear_screen, generate_centered_ascii_title, display_selection_menu
 
 # Kiểm tra hệ điều hành để import thư viện tương ứng
 IS_WINDOWS = sys.platform == "win32"
@@ -147,14 +147,12 @@ def play_audio_with_progress(audio_data, sampling_rate, voice_name):
         sd.stop()
 
 def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
-    """Chạy vòng lặp menu với menu phân cấp."""
+    """Chạy vòng lặp menu cho Box Voice với giao diện Rich."""
     try:
         while True:
             # --- MENU CHỌN NGÔN NGỮ ---
             clear_screen()
-            print(generate_centered_ascii_title("Box Voice"))
             
-            # 1. Nhóm các giọng nói theo ngôn ngữ để tạo menu
             voices_by_lang = {}
             for key, value in VOICE_PRESETS.items():
                 lang_name = re.match(r'\d+\.\s(.*?)\s-', key).group(1)
@@ -162,69 +160,50 @@ def run_boxvoice(model, processor, device, sampling_rate, cache_dir_path):
                     voices_by_lang[lang_name] = []
                 voices_by_lang[lang_name].append(key)
             
-            # Tạo danh sách các ngôn ngữ có sẵn
             available_langs = list(voices_by_lang.keys())
             
-            print("\nChọn một ngôn ngữ:")
+            # Tạo danh sách options cho menu
+            lang_options = [f"{lang} ({LANGUAGE_NATIVE_NAMES.get(VOICE_PRESETS[voices_by_lang[lang][0]]['lang'], '')})" for lang in available_langs]
             
-            for i, lang in enumerate(available_langs):
-                lang_code = VOICE_PRESETS[voices_by_lang[lang][0]]['lang']
-                native_name = LANGUAGE_NATIVE_NAMES.get(lang_code, '')
-                print(f"\n  {i+1}. {lang} ({native_name})")
+            lang_choice = display_selection_menu("Chọn một ngôn ngữ", lang_options, color="bright_cyan", back_option="Quay lại menu chính")
             
-            print("\n  0. Quay lại menu chính")
-            
-            lang_choice = input("\nNhập lựa chọn của bạn (0 để quay lại): ")
             if lang_choice == '0': break
 
             try:
                 lang_choice_num = int(lang_choice)
                 if not (1 <= lang_choice_num <= len(available_langs)):
-                    print("\nLựa chọn không hợp lệ!")
-                    time.sleep(1)
-                    continue # Quay lại menu chọn ngôn ngữ
+                    print("\nLựa chọn không hợp lệ!"); time.sleep(1); continue
                 
                 selected_lang = available_langs[lang_choice_num - 1]
                 voices_in_lang = voices_by_lang[selected_lang]
 
-                first_voice_key = voices_in_lang[0]
-                lang_code = VOICE_PRESETS[first_voice_key]['lang']
-                native_name_with_flag = LANGUAGE_NATIVE_NAMES.get(lang_code, '')
-
-                # --- MENU CHỌN GIỌNG NÓI TRONG NGÔN NGỮ ĐÃ CHỌN ---
+                # --- MENU CHỌN GIỌNG NÓI ---
                 while True:
                     clear_screen()
-                    print(generate_centered_ascii_title("Box Voice"))
-                    print(f"\n--- Chọn giọng nói: ({selected_lang} - {native_name_with_flag}) ---")
+                    native_name = LANGUAGE_NATIVE_NAMES.get(VOICE_PRESETS[voices_in_lang[0]]['lang'], '')
+                    menu_title = f"Chọn giọng nói ({selected_lang} - {native_name})"
                     
-                    for voice_key in voices_in_lang:
-                        print(f"\n  {voice_key}")
-
-                    print("\n  0. Quay lại menu ngôn ngữ")
-                    voice_choice = input("\nChọn một giọng nói để nghe thử (0 để quay lại): ")
+                    voice_choice = display_selection_menu(menu_title, voices_in_lang, color="bright_magenta", back_option="Quay lại menu ngôn ngữ")
+                    
                     if voice_choice == '0': break
 
                     try:
+                        # Logic xử lý lựa chọn giọng nói không thay đổi
                         voice_choice_num = int(voice_choice)
-                        selected_display_name = next((key for key in voices_in_lang if key.startswith(f"{voice_choice_num}. ")), None)
-                        
-                        if selected_display_name:
+                        # Tìm đúng lựa chọn trong danh sách gốc
+                        if 1 <= voice_choice_num <= len(voices_in_lang):
+                            selected_display_name = voices_in_lang[voice_choice_num - 1]
                             selected_voice_preset = VOICE_PRESETS[selected_display_name]["preset"]
-                            audio_to_play = get_audio_from_cache(selected_voice_preset, model, processor, device, sampling_rate, cache_dir=cache_dir_path)
                             
-                            # Gọi hàm phát audio mới thay cho logic cũ
+                            audio_to_play = get_audio_from_cache(selected_voice_preset, model, processor, device, sampling_rate, cache_dir=cache_dir_path)
                             play_audio_with_progress(audio_to_play, sampling_rate, selected_display_name)
                         else:
-                            print("\nLựa chọn không hợp lệ!")
-                            time.sleep(1)
-                    except ValueError:
-                        print("\nLựa chọn không hợp lệ! Vui lòng chỉ nhập số.")
-                        time.sleep(1)
+                            print("\nLựa chọn không hợp lệ!"); time.sleep(1)
+                    except (ValueError, IndexError):
+                        print("\nLựa chọn không hợp lệ!"); time.sleep(1)
 
             except ValueError:
-                print("\nLựa chọn không hợp lệ! Vui lòng chỉ nhập số.")
-                time.sleep(1)
+                print("\nLựa chọn không hợp lệ!"); time.sleep(1)
 
     except KeyboardInterrupt:
-        print("\nĐang quay lại menu chính...")
-        return
+        print("\nĐang quay lại menu chính..."); return

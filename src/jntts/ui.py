@@ -3,6 +3,7 @@ import pyfiglet
 import textwrap
 import wcwidth
 import random
+import re
 
 from rich.console import Console
 from rich.panel import Panel
