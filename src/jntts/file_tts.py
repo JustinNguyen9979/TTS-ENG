@@ -133,7 +133,7 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
 
                         audio_settings = prompt_for_audio_settings(
                             ask_for_speed=True, 
-                            ask_for_stability=True, 
+                            ask_for_stability=False, 
                             ask_for_bass_boost=True
                         )
 
@@ -149,7 +149,7 @@ def run_file_tts(model, processor, device, sampling_rate, input_dir, output_dir)
                         bass_info = f"Âm trầm = {bass_boost_db}" if bass_boost_db > 0 else "Âm trầm = Không"
                         voice_info = f"Giọng = '{voice_display_short}'"
 
-                        print(f"\n   -> Cấu hình: {speed_info}, {stability_info}, {bass_info}, {voice_info}")
+                        print(f"\n   -> Cấu hình: {speed_info} | {bass_info} | {voice_info}")
                         
                         tts_timer = Timer()
                         tts_timer.start()
